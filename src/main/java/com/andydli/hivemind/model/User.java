@@ -2,9 +2,9 @@ package com.andydli.hivemind.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.AccessLevel;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -40,6 +40,8 @@ public class User {
     private String lastName;
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Set<UserRole> userRoles = new HashSet<>();
 
