@@ -10,8 +10,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 
 import java.time.Instant;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Objects;
 
 @Entity
@@ -42,12 +40,6 @@ public class User {
     @Column(nullable = false, name = "last_name", length = 100)
     private String lastName;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "role")
-    @Enumerated(EnumType.STRING)
-    private Set<UserRole> userRoles = new HashSet<>();
-
     @Column(nullable = false, updatable = false, name = "created_at")
     private Instant createdAt;
     @Column(nullable = false, name = "updated_at")
@@ -70,7 +62,6 @@ public class User {
         this.passwordHash = passwordHash;
         this.firstName = firstName;
         this.lastName = lastName;
-        this.userRoles = new HashSet<>();
     }
 
     @Override
