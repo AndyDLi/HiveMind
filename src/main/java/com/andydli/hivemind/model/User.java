@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import lombok.AccessLevel;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
@@ -25,7 +24,7 @@ public class User {
 
     @NotBlank(message = "Email is Required")
     @Email(message = "Email Must Be Valid")
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(nullable = false, unique = true)
     private String email;
 
     @NotBlank(message = "Password is Required")
@@ -86,7 +85,7 @@ public class User {
 
     @Override
     public String toString() {
-        return String.format("User{id=%d, email='%s', firstName='%s', lastName='%s', createdAt=%s, updatedAt=%s}",
+        return String.format("User{id=%s, email='%s', firstName='%s', lastName='%s', createdAt=%s, updatedAt=%s}",
                 id, email, firstName, lastName, createdAt, updatedAt);
     }
 
