@@ -1,12 +1,13 @@
 package com.andydli.hivemind.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
 
 import java.time.Instant;
 import java.util.Set;
@@ -28,7 +29,8 @@ public class User {
     private String email;
 
     @NotBlank(message = "Password Hash is Required")
-    @JsonIgnore // excludes passwordHash from serialization completely
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // prevents serialization, allows deserialization
+    @Getter(AccessLevel.NONE) // do not generate public getter
     @Column(nullable = false, name = "password_hash")
     private String passwordHash;
 
