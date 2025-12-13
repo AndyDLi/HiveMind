@@ -27,7 +27,7 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @NotBlank(message = "Password is Required")
+    @NotBlank(message = "Password Hash is Required")
     @JsonIgnore // excludes passwordHash from serialization completely
     @Column(nullable = false, name = "password_hash")
     private String passwordHash;
@@ -75,12 +75,12 @@ public class User {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof User other)) return false;
-        return email != null && email.equals(other.email);
+        return this.id != null && this.id.equals(other.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(email);
+        return Objects.hashCode(this.id);
     }
 
     @Override
