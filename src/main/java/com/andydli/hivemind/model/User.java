@@ -39,7 +39,9 @@ public class User {
     @NotBlank(message = "Last Name is Required")
     private String lastName;
 
-    private Set<Role> userRoles = new HashSet<>();
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private Set<UserRole> userRoles = new HashSet<>();
 
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
