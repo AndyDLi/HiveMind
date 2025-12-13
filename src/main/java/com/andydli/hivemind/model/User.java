@@ -16,6 +16,7 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,14 +43,17 @@ public class User {
 
     @Column(nullable = false, updatable = false, name = "created_at")
     private Instant createdAt;
+
     @Column(nullable = false, name = "updated_at")
     private Instant updatedAt;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
         normalizeEmail();
     }
+
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = Instant.now();
