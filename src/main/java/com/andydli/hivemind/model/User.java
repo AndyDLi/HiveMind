@@ -36,6 +36,7 @@ public class User {
 
     @Transient
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Size(min = 8, max = 64, message = "Password Must Be Between 8 and 64 Characters")
     private String plainPassword; // used only for receiving plain password during registration
 
     @NotBlank(message = "First Name is Required")
@@ -68,16 +69,10 @@ public class User {
     }
 
     // Custom Constructor
-    public User(String email, String passwordHash, String firstName, String lastName) {
+    public User(String email, String firstName, String lastName) {
         this.email = email;
-        this.passwordHash = passwordHash;
         this.firstName = firstName;
         this.lastName = lastName;
-    }
-
-    // Package-Private Getter
-    String getPasswordHash() {
-        return this.passwordHash;
     }
 
     @Override

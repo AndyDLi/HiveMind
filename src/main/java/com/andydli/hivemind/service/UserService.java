@@ -18,6 +18,15 @@ public class UserService {
 
     @Transactional
     public User registerUser(User user) {
+        // null check
+        if (user == null) {
+            throw new IllegalArgumentException("User Cannot Be Null");
+        }
+
+        // email existence check
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new IllegalArgumentException("Email is Required");
+        }
         if (userRepository.existsByEmail(user.getEmail())) {
             throw new IllegalArgumentException("Email Already Exists");
         }
@@ -29,7 +38,7 @@ public class UserService {
         if (plainPassword == null || plainPassword.isBlank()) {
             throw new IllegalArgumentException("Password Cannot Be Empty");
         }
-        if (plainPassword.trim().length() < 8 || plainPassword.trim().length() > 64) {
+        if (plainPassword.length() < 8 || plainPassword.length() > 64) {
             throw new IllegalArgumentException("Password Must Be Between 8 and 64 Characters");
         }
 
