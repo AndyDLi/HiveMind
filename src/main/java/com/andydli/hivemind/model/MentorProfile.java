@@ -4,6 +4,10 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Size;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -25,6 +29,7 @@ public class MentorProfile {
     private User user;
 
     @Column(length = 1500)
+    @Size(max = 1500, message = "Bio Cannot Exceed 1500 Characters")
     private String bio;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -33,9 +38,12 @@ public class MentorProfile {
     private Set<String> skills = new HashSet<>();
 
     @Column(nullable = false)
+    @Min(value = 0, message = "Total Sessions Cannot Be Negative")
     private int totalSessions;
 
     @Column(nullable = false)
+    @DecimalMin(value = "0.0", inclusive = true, message = "Rating Must Be At Least 0.0")
+    @DecimalMax(value = "5.0", inclusive = true, message = "Rating Cannot Exceed 5.0")
     private double rating;
 
     @Column(nullable = false, updatable = false)
@@ -62,6 +70,8 @@ public class MentorProfile {
         this.user = user;
         this.bio = bio;
         this.skills = skills != null ? skills : new HashSet<>();
+        this.rating = 0.0;
+        this.totalSessions = 0;
     }
 
     @Override
@@ -78,7 +88,7 @@ public class MentorProfile {
 
     @Override
     public String toString() {
-        return String.format("MentorProfile{id=%s, bio='%s', skills=%s, rating=%.2f}",
-            id, bio, skills, rating);
+        return String.format("MentorProfile{id=%s, bio='%s', rating=%.2f, totalSessions=%d}",
+            id, bio, rating, totalSessions);
     }
 }
