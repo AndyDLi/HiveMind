@@ -6,6 +6,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AccessLevel;
 
@@ -33,11 +34,18 @@ public class User {
     @Column(nullable = false, name = "password_hash")
     private String passwordHash;
 
+    @Transient
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Size(min = 8, max = 64, message = "Password Must Be Between 8 and 64 Characters")
+    private String plainPassword; // used only for receiving plain password during registration
+
     @NotBlank(message = "First Name is Required")
+    @Size(min = 1, max = 100, message = "First Name Must Be Between 1 and 100 Characters")
     @Column(nullable = false, name = "first_name", length = 100)
     private String firstName;
 
     @NotBlank(message = "Last Name is Required")
+    @Size(min = 1, max = 100, message = "Last Name Must Be Between 1 and 100 Characters")
     @Column(nullable = false, name = "last_name", length = 100)
     private String lastName;
 
@@ -61,9 +69,8 @@ public class User {
     }
 
     // Custom Constructor
-    public User(String email, String passwordHash, String firstName, String lastName) {
+    public User(String email, String firstName, String lastName) {
         this.email = email;
-        this.passwordHash = passwordHash;
         this.firstName = firstName;
         this.lastName = lastName;
     }
