@@ -1,14 +1,8 @@
 package com.andydli.hivemind.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import lombok.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AccessLevel;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -23,29 +17,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Email is Required")
-    @Email(message = "Email Must Be Valid")
     @Column(nullable = false, unique = true)
     private String email;
 
-    @NotBlank(message = "Password Hash is Required")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // prevents serialization, allows deserialization
     @Getter(AccessLevel.NONE) // do not generate public getter
     @Column(nullable = false, name = "password_hash")
     private String passwordHash;
 
-    @Transient
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Size(min = 8, max = 64, message = "Password Must Be Between 8 and 64 Characters")
-    private String plainPassword; // used only for receiving plain password during registration
-
-    @NotBlank(message = "First Name is Required")
-    @Size(min = 1, max = 100, message = "First Name Must Be Between 1 and 100 Characters")
     @Column(nullable = false, name = "first_name", length = 100)
     private String firstName;
 
-    @NotBlank(message = "Last Name is Required")
-    @Size(min = 1, max = 100, message = "Last Name Must Be Between 1 and 100 Characters")
     @Column(nullable = false, name = "last_name", length = 100)
     private String lastName;
 
@@ -68,11 +50,10 @@ public class User {
         normalizeEmail();
     }
 
-    // Custom Constructor
-    public User(String email, String firstName, String lastName) {
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+    private void normalizeEmail() {
+        if (this.email != null) {
+            this.email = this.email.trim().toLowerCase();
+        }
     }
 
     @Override
@@ -91,11 +72,5 @@ public class User {
     public String toString() {
         return String.format("User{id=%s, email='%s', firstName='%s', lastName='%s', createdAt=%s, updatedAt=%s}",
                 id, email, firstName, lastName, createdAt, updatedAt);
-    }
-
-    private void normalizeEmail() {
-        if (this.email != null) {
-            this.email = this.email.trim().toLowerCase();
-        }
     }
 }
