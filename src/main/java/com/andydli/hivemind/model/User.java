@@ -3,6 +3,7 @@ package com.andydli.hivemind.model;
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -54,6 +55,10 @@ public class User {
         if (this.email != null) {
             this.email = this.email.trim().toLowerCase();
         }
+    }
+
+    public boolean verifyPassword(PasswordEncoder passwordEncoder, String plainPassword) {
+        return passwordEncoder.matches(plainPassword, this.passwordHash);
     }
 
     @Override
