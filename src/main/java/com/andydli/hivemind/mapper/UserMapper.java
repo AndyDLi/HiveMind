@@ -7,7 +7,7 @@ import com.andydli.hivemind.dto.UserRegistrationDTO;
 
 @Component
 public class UserMapper {
-    public UserDTO userToUserDTO(User user) {
+    public UserDTO toDTO(User user) {
         if (user == null) {
             return null;
         }
