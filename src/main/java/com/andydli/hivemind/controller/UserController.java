@@ -1,6 +1,5 @@
 package com.andydli.hivemind.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.andydli.hivemind.service.UserService;
@@ -9,11 +8,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.HttpStatus;
 import com.andydli.hivemind.model.User;
 import com.andydli.hivemind.dto.UserDTO;
 import com.andydli.hivemind.dto.UserRegistrationDTO;
 import com.andydli.hivemind.dto.UserLoginDTO;
-import com.andydli.hivemind.dto.AuthResponseDTO;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.HttpHeaders;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -34,8 +36,19 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDTO> authenticateUser(@Valid @RequestBody UserLoginDTO userLoginDTO) {
+    public ResponseEntity<Void> authenticateUser(
+            @Valid @RequestBody UserLoginDTO userLoginDTO,
+            HttpServletResponse response
+    ) {
         String token = userService.authenticateUser(userLoginDTO);
-        return ResponseEntity.ok(new AuthResponseDTO(token, "Bearer"));
+        ResponseCookie jwtCookie = ResponseCookie.from("token", token)
+                .httpOnly(true)
+                .secure(false) // set to true in production with HTTPS
+                .path("/")
+                .maxAge(24 * 60 * 60)
+                .sameSite("Lax") // "Lax" for localhost, "Strict" for production
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
+        return ResponseEntity.ok().build();
     }
 }
