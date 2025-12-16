@@ -45,7 +45,16 @@ public class JwtService {
     }
 
     public Long extractUserId(String token) {
-        return Long.parseLong(parseClaims(token).getSubject());
+        String subject = parseClaims(token).getSubject();
+        if (subject == null || subject.trim().isEmpty()) {
+            throw new IllegalArgumentException("JWT Subject is Missing or Empty");
+        }
+
+        try {
+            return Long.parseLong(subject);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid User ID in JWT Token: " + subject, e);
+        }
     }
 
     private Claims parseClaims(String token) {
