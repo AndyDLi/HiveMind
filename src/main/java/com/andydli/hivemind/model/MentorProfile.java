@@ -65,15 +65,6 @@ public class MentorProfile {
         this.updatedAt = Instant.now();
     }
 
-    // Custom Constructor
-    public MentorProfile(User user, String bio, Set<String> skills) {
-        this.user = user;
-        this.bio = bio;
-        this.skills = skills != null ? skills : new HashSet<>();
-        this.rating = 0.0;
-        this.totalSessions = 0;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
