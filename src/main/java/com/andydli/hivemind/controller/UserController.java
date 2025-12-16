@@ -16,7 +16,7 @@ import com.andydli.hivemind.dto.UserLoginDTO;
 import com.andydli.hivemind.dto.AuthResponseDTO;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/auth")
 public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
