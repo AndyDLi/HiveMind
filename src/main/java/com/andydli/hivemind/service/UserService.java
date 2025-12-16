@@ -31,6 +31,11 @@ public class UserService {
 
     @Transactional
     public User registerUser(UserRegistrationDTO userRegistrationDTO) {
+        // confirm passwords match
+        if (!userRegistrationDTO.validatePasswordsMatch()) {
+            throw new IllegalArgumentException("Passwords Do Not Match");
+        }
+
         // normalize registration email and check for uniqueness
         String normalizedEmail = userRegistrationDTO.email().trim().toLowerCase();
         if (userRepository.existsByEmail(normalizedEmail)) {

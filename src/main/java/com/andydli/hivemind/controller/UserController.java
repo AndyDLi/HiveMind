@@ -51,4 +51,17 @@ public class UserController {
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletResponse response) {
+        ResponseCookie deleteCookie = ResponseCookie.from("token", "")
+                .httpOnly(true)
+                .secure(false) // match login cookie settings
+                .path("/")
+                .maxAge(0) // delete cookie
+                .sameSite("Lax") // match login cookie settings
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
+        return ResponseEntity.ok().build();
+    }
 }
