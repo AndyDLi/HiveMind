@@ -1,13 +1,11 @@
 package com.andydli.hivemind.controller;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import com.andydli.hivemind.service.UserService;
 import com.andydli.hivemind.mapper.UserMapper;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.http.HttpStatus;
 import com.andydli.hivemind.model.User;
 import com.andydli.hivemind.dto.UserDTO;
@@ -18,7 +16,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.HttpHeaders;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
@@ -26,6 +24,12 @@ public class UserController {
     public UserController(UserService userService, UserMapper userMapper) {
         this.userService = userService;
         this.userMapper = userMapper;
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal User user) {
+        UserDTO userDTO = userMapper.toDTO(user);
+        return ResponseEntity.ok(userDTO);
     }
 
     @PostMapping("/register")
