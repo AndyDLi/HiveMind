@@ -45,6 +45,7 @@ public class UserController {
             HttpServletResponse response
     ) {
         String token = userService.authenticateUser(userLoginDTO);
+        // store token in httpOnly cookie
         ResponseCookie jwtCookie = ResponseCookie.from("token", token)
                 .httpOnly(true)
                 .secure(false) // set to true in production with HTTPS

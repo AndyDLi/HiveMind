@@ -26,6 +26,7 @@ public class JwtService {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
+        // build a JWT token
         return Jwts.builder()
                 .setSubject(userId.toString())
                 .claim("email", email)
@@ -58,6 +59,7 @@ public class JwtService {
     }
 
     private Claims parseClaims(String token) {
+        // parse a JWT token
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
