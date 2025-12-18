@@ -1,5 +1,6 @@
 package com.andydli.hivemind.service;
 
+import com.andydli.hivemind.exceptions.*;
 import org.springframework.stereotype.Service;
 import com.andydli.hivemind.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,13 +34,13 @@ public class UserService {
     public User registerUser(UserRegistrationDTO userRegistrationDTO) {
         // confirm passwords match
         if (!userRegistrationDTO.validatePasswordsMatch()) {
-            throw new IllegalArgumentException("Passwords Do Not Match");
+            throw new PasswordMismatchException("Passwords Do Not Match");
         }
 
         // normalize registration email and check for uniqueness
         String normalizedEmail = userRegistrationDTO.email().trim().toLowerCase();
         if (userRepository.existsByEmail(normalizedEmail)) {
-            throw new IllegalArgumentException("Email Already Exists");
+            throw new EmailAlreadyExistsException("Email Already Exists");
         }
 
         // map DTO to entity
@@ -59,11 +60,11 @@ public class UserService {
     public String authenticateUser(UserLoginDTO userLoginDTO) {
         String normalizedEmail = userLoginDTO.email().trim().toLowerCase();
         User user = userRepository.findByEmail(normalizedEmail)
-                .orElseThrow(() -> new IllegalArgumentException("Invalid Email or Password"));
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid Email or Password"));
 
         String plainPassword = userLoginDTO.plainPassword();
         if (!user.verifyPassword(passwordEncoder, plainPassword)) {
-            throw new IllegalArgumentException("Invalid Email or Password");
+            throw new InvalidCredentialsException("Invalid Email or Password");
         }
 
         return jwtService.generateToken(user.getId(), user.getEmail());

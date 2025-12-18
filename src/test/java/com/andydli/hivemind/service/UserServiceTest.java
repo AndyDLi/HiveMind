@@ -2,6 +2,7 @@ package com.andydli.hivemind.service;
 
 import com.andydli.hivemind.dto.UserLoginDTO;
 import com.andydli.hivemind.dto.UserRegistrationDTO;
+import com.andydli.hivemind.exceptions.*;
 import com.andydli.hivemind.mapper.UserMapper;
 import com.andydli.hivemind.model.User;
 import com.andydli.hivemind.repository.UserRepository;
@@ -57,7 +58,7 @@ public class UserServiceTest {
                 USER_EMAIL, USER_PLAIN_PASSWORD, USER_PLAIN_WRONG_PASSWORD, USER_FIRST_NAME, USER_LAST_NAME
         );
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+        PasswordMismatchException ex = assertThrows(PasswordMismatchException.class, () -> {
             userService.registerUser(mismatchedPasswordDTO);
         });
         assertEquals("Passwords Do Not Match", ex.getMessage());
@@ -76,7 +77,7 @@ public class UserServiceTest {
                 USER_EMAIL, USER_PLAIN_PASSWORD, USER_PLAIN_PASSWORD, USER_FIRST_NAME, USER_LAST_NAME
         );
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+        EmailAlreadyExistsException ex = assertThrows(EmailAlreadyExistsException.class, () -> {
             userService.registerUser(dto);
         });
         assertEquals("Email Already Exists", ex.getMessage());
@@ -142,7 +143,7 @@ public class UserServiceTest {
 
         when(userRepository.findByEmail(USER_UNKNOWN_EMAIL)).thenReturn(Optional.empty());
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+        InvalidCredentialsException ex = assertThrows(InvalidCredentialsException.class, () -> {
             userService.authenticateUser(loginDTO);
         });
 
@@ -160,7 +161,7 @@ public class UserServiceTest {
         when(userRepository.findByEmail(USER_EMAIL)).thenReturn(Optional.of(user));
         when(user.verifyPassword(passwordEncoder, USER_PLAIN_WRONG_PASSWORD)).thenReturn(false);
 
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> {
+        InvalidCredentialsException ex = assertThrows(InvalidCredentialsException.class, () -> {
             userService.authenticateUser(loginDTO);
         });
 
