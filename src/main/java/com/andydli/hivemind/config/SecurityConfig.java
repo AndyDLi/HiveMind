@@ -45,12 +45,8 @@ public class SecurityConfig {
                                 "/api/user/logout",
                                 "/",
                                 "/login",
-                                "/register",
-                                "/home"
+                                "/register"
                         ).permitAll()
-                        .requestMatchers(
-                                "/api/user/me"
-                        ).authenticated()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

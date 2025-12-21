@@ -9,30 +9,25 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 public class ViewController {
     @GetMapping("/")
     public String landing(Authentication auth) {
-        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
-            return "redirect:/home";
-        }
-        return "landing";
+        return isAuthenticated(auth) ? "redirect:/home" : "landing";
     }
 
     @GetMapping("/login")
     public String login(Authentication auth) {
-        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
-            return "redirect:/home";
-        }
-        return "login";
+        return isAuthenticated(auth) ? "redirect:/home" : "login";
     }
 
     @GetMapping("/register")
     public String register(Authentication auth) {
-        if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
-            return "redirect:/home";
-        }
-        return "register";
+        return isAuthenticated(auth) ? "redirect:/home" : "register";
     }
 
     @GetMapping("/home")
     public String home() {
         return "home";
+    }
+
+    private boolean isAuthenticated(Authentication auth) {
+        return auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken);
     }
 }
