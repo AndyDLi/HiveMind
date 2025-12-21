@@ -29,6 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.userRepository = userRepository;
     }
 
+    // runs on every HTTP request that requires authentication
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -58,10 +59,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // build authenticated user token and set in security context
+            // build authenticated user token: user = principal, null = credentials, emptyList = authorities
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     user, null, Collections.emptyList());
+
+            // attaches HTTP metadata to the token
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+            // set the authentication in the security context
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (Exception e) {
             logger.warn("JWT Authentication Processing Failed: " + e.getMessage());
