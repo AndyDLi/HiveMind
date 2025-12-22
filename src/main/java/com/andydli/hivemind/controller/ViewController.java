@@ -9,7 +9,7 @@ import org.springframework.security.authentication.AnonymousAuthenticationToken;
 public class ViewController {
     @GetMapping("/")
     public String landing(Authentication auth) {
-        return isAuthenticated(auth) ? "redirect:/home" : "landing";
+        return isAuthenticated(auth) ? "redirect:/home" : "login";
     }
 
     @GetMapping("/login")

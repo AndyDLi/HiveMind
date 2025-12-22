@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Login - HiveMind</title>
+        <link rel="stylesheet" th:href="@{/css/login.css}">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <!-- Animated Background -->
+        <div class="bg-animation">
+            <div class="grid-overlay"></div>
+            <div class="glow-orb orb-1"></div>
+            <div class="glow-orb orb-2"></div>
+            <div class="glow-orb orb-3"></div>
+            <div class="particles" id="particles"></div>
+        </div>
+
+        <!-- Main Container -->
+        <main class="login-container">
+            <!-- Logo Section -->
+            <div class="logo-section">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 100 100" class="hexagon-logo">
+                        <defs>
+                            <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#00d4ff"/>
+                                <stop offset="50%" style="stop-color:#7b2cbf"/>
+                                <stop offset="100%" style="stop-color:#c77dff"/>
+                            </linearGradient>
+                        </defs>
+                        <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5"
+                                 fill="none"
+                                 stroke="url(#logoGradient)"
+                                 stroke-width="2"
+                                 class="hex-border"/>
+                        <text x="50" y="58" text-anchor="middle" fill="url(#logoGradient)"
+                              font-family="Orbitron" font-size="24" font-weight="700">H</text>
+                    </svg>
+                </div>
+                <h1 class="logo-text">HiveMind</h1>
+                <p class="tagline">Welcome Back</p>
+            </div>
+
+            <!-- Login Card -->
+            <div class="login-card">
+                <div class="card-glow"></div>
+                <div class="card-content">
+                    <h2 class="card-title">Sign In</h2>
+                    <p class="card-subtitle">Access Your Collective</p>
+
+                    <!-- Login Form -->
+                    <form id="loginForm" class="login-form" novalidate>
+                        <!-- Email -->
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <input type="email"
+                                       id="email"
+                                       name="email"
+                                       required
+                                       autocomplete="email"
+                                       placeholder=" ">
+                                <label for="email">Email Address</label>
+                                <div class="input-border"></div>
+                                <div class="input-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="2" y="4" width="20" height="16" rx="2"/>
+                                        <path d="M22 6l-10 7L2 6"/>
+                                    </svg>
+                                </div>
+                            </div>
+                            <span class="error-message" id="emailError"></span>
+                        </div>
+
+                        <!-- Password -->
+                        <div class="input-group">
+                            <div class="input-wrapper has-toggle">
+                                <input type="password"
+                                       id="plainPassword"
+                                       name="plainPassword"
+                                       required
+                                       autocomplete="current-password"
+                                       placeholder=" ">
+                                <label for="plainPassword">Password</label>
+                                <div class="input-border"></div>
+                                <button type="button" class="toggle-password" tabindex="-1">
+                                    <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                    <svg class="eye-closed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                                        <line x1="1" y1="1" x2="23" y2="23"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <span class="error-message" id="plainPasswordError"></span>
+                        </div>
+
+                        <!-- Error Alert -->
+                        <div class="alert alert-error" id="errorAlert">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            <span id="errorMessage"></span>
+                        </div>
+
+                        <!-- Success Alert -->
+                        <div class="alert alert-success" id="successAlert">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                            <span id="successMessage"></span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                            <span class="btn-text">Sign In</span>
+                            <span class="btn-loader">
+                                <svg class="spinner" viewBox="0 0 50 50">
+                                    <circle cx="25" cy="25" r="20" fill="none" stroke-width="4"></circle>
+                                </svg>
+                            </span>
+                            <span class="btn-success">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12"/>
+                                </svg>
+                            </span>
+                        </button>
+                    </form>
+
+                    <!-- Divider -->
+                    <div class="divider">
+                        <span>or</span>
+                    </div>
+
+                    <!-- Register Link -->
+                    <p class="register-link">
+                        Don't Have an Account?
+                        <a th:href="@{/register}">Create one</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="login-footer">
+                <p>&copy; 2025 HiveMind. All rights reserved.</p>
+            </footer>
+        </main>
+
+        <script th:src="@{/js/login.js}"></script>
+    </body>
+</html>

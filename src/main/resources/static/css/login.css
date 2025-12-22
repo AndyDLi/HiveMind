@@ -1,0 +1,871 @@
+/* ============================================
+   HiveMind Login Page - Futuristic Theme
+   Color Palette: Dark, Black, Light Blue, Purple
+   ============================================ */
+
+/* CSS Variables */
+:root {
+    /* Primary Colors */
+    --color-bg-dark: #0a0a0f;
+    --color-bg-card: rgba(15, 15, 25, 0.85);
+    --color-bg-input: rgba(20, 20, 35, 0.6);
+
+    /* Accent Colors */
+    --color-cyan: #00d4ff;
+    --color-cyan-glow: rgba(0, 212, 255, 0.4);
+    --color-purple: #7b2cbf;
+    --color-purple-light: #c77dff;
+    --color-purple-glow: rgba(123, 44, 191, 0.4);
+
+    /* Gradient */
+    --gradient-primary: linear-gradient(135deg, #00d4ff 0%, #7b2cbf 50%, #c77dff 100%);
+    --gradient-hover: linear-gradient(135deg, #00e5ff 0%, #9d4edd 50%, #e0aaff 100%);
+
+    /* Text Colors */
+    --color-text-primary: #ffffff;
+    --color-text-secondary: rgba(255, 255, 255, 0.7);
+    --color-text-muted: rgba(255, 255, 255, 0.4);
+
+    /* Status Colors */
+    --color-error: #ff4757;
+    --color-success: #2ed573;
+    --color-warning: #ffa502;
+
+    /* Borders */
+    --border-color: rgba(255, 255, 255, 0.1);
+    --border-focus: var(--color-cyan);
+
+    /* Shadows */
+    --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    --shadow-glow: 0 0 40px var(--color-cyan-glow), 0 0 80px var(--color-purple-glow);
+
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-medium: 0.3s ease;
+    --transition-slow: 0.5s ease;
+
+    /* Fonts */
+    --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-display: 'Orbitron', monospace;
+}
+
+/* Reset & Base */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-primary);
+    background-color: var(--color-bg-dark);
+    color: var(--color-text-primary);
+    height: 100vh;
+    overflow: hidden;
+    line-height: 1.5;
+}
+
+/* ============================================
+   Background Animation
+   ============================================ */
+.bg-animation {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+/* Grid Overlay */
+.grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        linear-gradient(rgba(0, 212, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 212, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+    0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+    100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+}
+
+/* Glowing Orbs */
+.glow-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    animation: orbFloat 15s ease-in-out infinite;
+}
+
+.orb-1 {
+    width: 400px;
+    height: 400px;
+    background: var(--color-cyan);
+    top: -100px;
+    right: -100px;
+    animation-delay: 0s;
+}
+
+.orb-2 {
+    width: 500px;
+    height: 500px;
+    background: var(--color-purple);
+    bottom: -150px;
+    left: -150px;
+    animation-delay: -5s;
+}
+
+.orb-3 {
+    width: 300px;
+    height: 300px;
+    background: var(--color-purple-light);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation-delay: -10s;
+}
+
+@keyframes orbFloat {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.4;
+    }
+    25% {
+        transform: translate(30px, -30px) scale(1.1);
+        opacity: 0.6;
+    }
+    50% {
+        transform: translate(-20px, 20px) scale(0.9);
+        opacity: 0.5;
+    }
+    75% {
+        transform: translate(-30px, -20px) scale(1.05);
+        opacity: 0.45;
+    }
+}
+
+/* Particles Container */
+.particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--color-cyan);
+    border-radius: 50%;
+    opacity: 0;
+    animation: particleFloat 8s ease-in-out infinite;
+}
+
+@keyframes particleFloat {
+    0% {
+        opacity: 0;
+        transform: translateY(100vh) scale(0);
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-100vh) scale(1);
+    }
+}
+
+/* ============================================
+   Main Container
+   ============================================ */
+.login-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
+/* ============================================
+   Logo Section
+   ============================================ */
+.logo-section {
+    text-align: center;
+    margin-bottom: 0.5rem;
+    animation: fadeInDown 0.8s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.logo-icon {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 0.25rem;
+}
+
+.hexagon-logo {
+    width: 100%;
+    height: 100%;
+    animation: logoGlow 3s ease-in-out infinite;
+}
+
+.hex-border {
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+    animation: drawHex 2s ease-out forwards, hexPulse 3s ease-in-out infinite 2s;
+}
+
+@keyframes drawHex {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes hexPulse {
+    0%, 100% { filter: drop-shadow(0 0 5px var(--color-cyan)); }
+    50% { filter: drop-shadow(0 0 20px var(--color-purple)); }
+}
+
+@keyframes logoGlow {
+    0%, 100% { filter: drop-shadow(0 0 10px var(--color-cyan-glow)); }
+    50% { filter: drop-shadow(0 0 20px var(--color-purple-glow)); }
+}
+
+.logo-text {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    font-weight: 700;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.tagline {
+    font-size: 0.65rem;
+    color: var(--color-text-muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 0.15rem;
+}
+
+/* ============================================
+   Login Card
+   ============================================ */
+.login-card {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card-glow {
+    position: absolute;
+    inset: -2px;
+    background: var(--gradient-primary);
+    border-radius: 24px;
+    opacity: 0;
+    filter: blur(20px);
+    transition: opacity var(--transition-medium);
+    z-index: -1;
+}
+
+.login-card:hover .card-glow {
+    opacity: 0.3;
+}
+
+.card-content {
+    background: var(--color-bg-card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.card-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-cyan), var(--color-purple), transparent);
+    opacity: 0.5;
+}
+
+.card-title {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 0.15rem;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.card-subtitle {
+    text-align: center;
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+    margin-bottom: 0.75rem;
+}
+
+/* ============================================
+   Form Styles
+   ============================================ */
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.input-group {
+    position: relative;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper input {
+    width: 100%;
+    height: 42px;
+    background: var(--color-bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0 0.875rem;
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+    color: var(--color-text-primary);
+    transition: all var(--transition-medium);
+    outline: none;
+}
+
+/* Hide browser default password reveal icon */
+.input-wrapper input::-ms-reveal,
+.input-wrapper input::-ms-clear {
+    display: none;
+}
+
+.input-wrapper input::-webkit-credentials-auto-fill-button {
+    display: none !important;
+}
+
+/* Inputs with toggle button need right padding */
+.input-wrapper.has-toggle input {
+    padding-right: 3rem;
+}
+
+.input-wrapper input:hover {
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.input-wrapper input:focus {
+    border-color: var(--color-cyan);
+    background: rgba(0, 212, 255, 0.05);
+}
+
+.input-wrapper input.error {
+    border-color: var(--color-error) !important;
+    background: rgba(255, 71, 87, 0.05);
+}
+
+.input-wrapper input.success {
+    border-color: var(--color-success);
+}
+
+/* Reset to default state when empty */
+.input-wrapper input.neutral {
+    border-color: var(--border-color);
+    background: var(--color-bg-input);
+}
+
+/* Floating Label */
+.input-wrapper label {
+    position: absolute;
+    left: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    pointer-events: none;
+    transition: all var(--transition-medium);
+    background: transparent;
+    padding: 0 0.25rem;
+}
+
+.input-wrapper input:focus ~ label,
+.input-wrapper input:not(:placeholder-shown) ~ label {
+    top: 0;
+    font-size: 0.65rem;
+    color: var(--color-cyan);
+    background: var(--color-bg-card);
+}
+
+.input-wrapper input.error ~ label {
+    color: var(--color-error);
+}
+
+/* Input Border Animation */
+.input-border {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--gradient-primary);
+    transition: all var(--transition-medium);
+    transform: translateX(-50%);
+    border-radius: 0 0 8px 8px;
+}
+
+.input-wrapper input:focus ~ .input-border {
+    width: 100%;
+}
+
+/* Input Icon */
+.input-icon {
+    position: absolute;
+    right: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: var(--color-text-muted);
+    transition: color var(--transition-medium);
+    pointer-events: none;
+}
+
+.input-wrapper input:focus ~ .input-icon {
+    color: var(--color-cyan);
+}
+
+/* Password Toggle */
+.toggle-password {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 22px;
+    height: 22px;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: color var(--transition-medium);
+    padding: 0;
+}
+
+.toggle-password:hover {
+    color: var(--color-cyan);
+}
+
+.toggle-password svg {
+    width: 18px;
+    height: 18px;
+}
+
+.toggle-password .eye-closed {
+    display: none;
+}
+
+.toggle-password.active .eye-open {
+    display: none;
+}
+
+.toggle-password.active .eye-closed {
+    display: block;
+}
+
+/* Error Message */
+.error-message {
+    display: block;
+    font-size: 0.65rem;
+    color: var(--color-error);
+    margin-top: 0.15rem;
+    padding-left: 0.5rem;
+    min-height: 0.75rem;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: all var(--transition-fast);
+}
+
+.error-message.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ============================================
+   Alerts
+   ============================================ */
+.alert {
+    display: none;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    animation: alertSlideIn 0.3s ease-out;
+}
+
+@keyframes alertSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.alert svg {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.alert.visible {
+    display: flex;
+}
+
+.alert-error {
+    background: rgba(255, 71, 87, 0.1);
+    border: 1px solid rgba(255, 71, 87, 0.3);
+    color: var(--color-error);
+}
+
+.alert-success {
+    background: rgba(46, 213, 115, 0.1);
+    border: 1px solid rgba(46, 213, 115, 0.3);
+    color: var(--color-success);
+}
+
+/* ============================================
+   Submit Button
+   ============================================ */
+.submit-btn {
+    position: relative;
+    width: 100%;
+    height: 42px;
+    background: var(--gradient-primary);
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    overflow: hidden;
+    transition: all var(--transition-medium);
+    margin-top: 0.15rem;
+}
+
+.submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.submit-btn:hover::before {
+    left: 100%;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px -10px var(--color-purple-glow);
+}
+
+.submit-btn:active {
+    transform: translateY(0);
+}
+
+.submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.submit-btn:disabled::before {
+    display: none;
+}
+
+.btn-text,
+.btn-loader,
+.btn-success {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: all var(--transition-medium);
+}
+
+.btn-loader,
+.btn-success {
+    opacity: 0;
+}
+
+.submit-btn.loading .btn-text {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+}
+
+.submit-btn.loading .btn-loader {
+    opacity: 1;
+}
+
+.submit-btn.success .btn-text {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5);
+}
+
+.submit-btn.success .btn-success {
+    opacity: 1;
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    animation: rotate 1s linear infinite;
+}
+
+.spinner circle {
+    stroke: white;
+    stroke-linecap: round;
+    stroke-dasharray: 80;
+    stroke-dashoffset: 60;
+    animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes rotate {
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes dash {
+    0% {
+        stroke-dasharray: 1, 150;
+        stroke-dashoffset: 0;
+    }
+    50% {
+        stroke-dasharray: 90, 150;
+        stroke-dashoffset: -35;
+    }
+    100% {
+        stroke-dasharray: 90, 150;
+        stroke-dashoffset: -124;
+    }
+}
+
+.btn-success svg {
+    width: 28px;
+    height: 28px;
+    stroke-dasharray: 30;
+    stroke-dashoffset: 30;
+    animation: checkmark 0.4s ease-out forwards;
+}
+
+@keyframes checkmark {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* ============================================
+   Divider
+   ============================================ */
+.divider {
+    position: relative;
+    text-align: center;
+    margin: 0.6rem 0;
+}
+
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border-color);
+}
+
+.divider span {
+    position: relative;
+    background: var(--color-bg-card);
+    padding: 0 0.75rem;
+    color: var(--color-text-muted);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* ============================================
+   Register Link
+   ============================================ */
+.register-link {
+    text-align: center;
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+}
+
+.register-link a {
+    color: var(--color-cyan);
+    text-decoration: none;
+    font-weight: 500;
+    position: relative;
+    transition: color var(--transition-fast);
+}
+
+.register-link a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--gradient-primary);
+    transition: width var(--transition-medium);
+}
+
+.register-link a:hover {
+    color: var(--color-purple-light);
+}
+
+.register-link a:hover::after {
+    width: 100%;
+}
+
+/* ============================================
+   Footer
+   ============================================ */
+.login-footer {
+    margin-top: 0.5rem;
+    text-align: center;
+    color: var(--color-text-muted);
+    font-size: 0.65rem;
+    animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+/* ============================================
+   Responsive Design
+   ============================================ */
+@media (max-width: 600px) {
+    .login-container {
+        padding: 0.5rem;
+    }
+
+    .card-content {
+        padding: 1rem;
+    }
+
+    .logo-text {
+        font-size: 1rem;
+    }
+
+    .card-title {
+        font-size: 1rem;
+    }
+
+    .input-wrapper input {
+        height: 38px;
+    }
+
+    .submit-btn {
+        height: 38px;
+    }
+}
+
+/* ============================================
+   Accessibility
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .glow-orb {
+        animation: none;
+        opacity: 0.3;
+    }
+
+    .grid-overlay {
+        animation: none;
+    }
+}
+
+/* Focus Visible for Keyboard Navigation */
+input:focus-visible,
+button:focus-visible,
+a:focus-visible {
+    outline: 2px solid var(--color-cyan);
+    outline-offset: 2px;
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    :root {
+        --border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .input-wrapper input {
+        border-width: 2px;
+    }
+}
