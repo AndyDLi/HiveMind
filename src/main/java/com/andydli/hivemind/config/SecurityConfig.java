@@ -45,7 +45,11 @@ public class SecurityConfig {
                                 "/api/user/logout",
                                 "/",
                                 "/login",
-                                "/register"
+                                "/register",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/favicon.ico"
                         ).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

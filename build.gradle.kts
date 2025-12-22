@@ -28,6 +28,7 @@ dependencies {
     // Spring Boot Starters & Reactive Web
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 
     // Persistence & Database
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
