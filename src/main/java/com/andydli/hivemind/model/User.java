@@ -3,10 +3,13 @@ package com.andydli.hivemind.model;
 import jakarta.persistence.*;
 import lombok.*;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
 import java.util.Objects;
+import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Getter
@@ -31,6 +34,10 @@ public class User {
 
     @Column(nullable = false, name = "last_name", length = 100)
     private String lastName;
+
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY) // non-owning side
+    @JsonManagedReference
+    private List<Portal> portals = new ArrayList<>();
 
     @Column(nullable = false, updatable = false, name = "created_at")
     private Instant createdAt;
@@ -59,6 +66,22 @@ public class User {
 
     public boolean verifyPassword(PasswordEncoder passwordEncoder, String plainPassword) {
         return passwordEncoder.matches(plainPassword, this.passwordHash);
+    }
+
+    public void addPortal(Portal portal) {
+        if (portal == null) return;
+        if (this.portals.contains(portal)) return;
+
+        this.portals.add(portal);
+        portal.setCreator(this);
+    }
+
+    public void removePortal(Portal portal) {
+        if (portal == null) return;
+        if (!this.portals.contains(portal)) return;
+
+        this.portals.remove(portal);
+        portal.setCreator(null);
     }
 
     @Override
