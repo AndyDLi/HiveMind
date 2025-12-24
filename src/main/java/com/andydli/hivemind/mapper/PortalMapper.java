@@ -6,6 +6,7 @@ import com.andydli.hivemind.dto.PortalDTO;
 import com.andydli.hivemind.dto.PortalCreationDTO;
 import com.andydli.hivemind.model.User;
 import com.andydli.hivemind.dto.UserDTO;
+import com.andydli.hivemind.exceptions.ResourceNotFoundException;
 
 @Component
 public class PortalMapper {
@@ -15,6 +16,10 @@ public class PortalMapper {
         }
 
         User creator = portal.getCreator();
+        if (creator == null) {
+            throw new ResourceNotFoundException("Portal Creator Not Found");
+        }
+
         UserDTO userDTO = new UserDTO(
                 creator.getId(),
                 creator.getEmail(),

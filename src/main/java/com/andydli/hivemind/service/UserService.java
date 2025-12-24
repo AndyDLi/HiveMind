@@ -9,8 +9,6 @@ import com.andydli.hivemind.model.User;
 import com.andydli.hivemind.mapper.UserMapper;
 import com.andydli.hivemind.dto.UserRegistrationDTO;
 import com.andydli.hivemind.dto.UserLoginDTO;
-import com.andydli.hivemind.model.Portal;
-import com.andydli.hivemind.dto.PortalCreationDTO;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -70,10 +68,5 @@ public class UserService {
         }
 
         return jwtService.generateToken(user.getId(), user.getEmail());
-    }
-
-    @Transactional
-    public Portal createPortal(PortalCreationDTO portalCreationDTO) {
-        return null;
     }
 }
