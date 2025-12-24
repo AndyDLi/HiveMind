@@ -68,6 +68,22 @@ public class User {
         return passwordEncoder.matches(plainPassword, this.passwordHash);
     }
 
+    public void addPortal(Portal portal) {
+        if (portal == null) return;
+        if (this.portals.contains(portal)) return;
+
+        this.portals.add(portal);
+        portal.setCreator(this);
+    }
+
+    public void removePortal(Portal portal) {
+        if (portal == null) return;
+        if (!this.portals.contains(portal)) return;
+
+        this.portals.remove(portal);
+        portal.setCreator(null);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

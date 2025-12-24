@@ -17,10 +17,10 @@ public class Portal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, name = "topic")
+    @Column(nullable = false, name = "topic", length = 100)
     private String topic;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 1000)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
