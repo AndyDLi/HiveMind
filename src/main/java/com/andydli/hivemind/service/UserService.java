@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.andydli.hivemind.security.JwtService;
 import com.andydli.hivemind.model.User;
 import com.andydli.hivemind.mapper.UserMapper;
+import com.andydli.hivemind.dto.UserDTO;
 import com.andydli.hivemind.dto.UserRegistrationDTO;
 import com.andydli.hivemind.dto.UserLoginDTO;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +32,7 @@ public class UserService {
     }
 
     @Transactional
-    public User registerUser(UserRegistrationDTO userRegistrationDTO) {
+    public UserDTO registerUser(UserRegistrationDTO userRegistrationDTO) {
         // confirm passwords match
         if (!userRegistrationDTO.validatePasswordsMatch()) {
             throw new PasswordMismatchException("Passwords Do Not Match");
@@ -54,7 +55,8 @@ public class UserService {
         user.setEmail(normalizedEmail);
         user.setPasswordHash(hashedPassword);
 
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        return userMapper.toDTO(savedUser);
     }
 
     public String authenticateUser(UserLoginDTO userLoginDTO) {
