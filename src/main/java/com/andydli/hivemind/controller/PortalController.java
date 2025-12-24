@@ -10,7 +10,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import com.andydli.hivemind.model.User;
 import org.springframework.http.HttpStatus;
 
-
 @RestController
 @RequestMapping("/api/portals")
 public class PortalController {
@@ -27,5 +26,14 @@ public class PortalController {
     ) {
         PortalDTO portalDTO = portalService.createPortal(portalCreationDTO, user.getId());
         return ResponseEntity.status(HttpStatus.CREATED).body(portalDTO);
+    }
+
+    @DeleteMapping("/{portalId}")
+    public ResponseEntity<Void> deletePortal(
+            @PathVariable Long portalId,
+            @AuthenticationPrincipal User user
+    ) {
+        portalService.deletePortal(portalId, user.getId());
+        return ResponseEntity.noContent().build();
     }
 }

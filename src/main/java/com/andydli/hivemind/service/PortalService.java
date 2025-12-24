@@ -10,6 +10,7 @@ import com.andydli.hivemind.dto.PortalCreationDTO;
 import com.andydli.hivemind.repository.PortalRepository;
 import com.andydli.hivemind.model.User;
 import com.andydli.hivemind.exceptions.ResourceNotFoundException;
+import com.andydli.hivemind.exceptions.ForbiddenOperationException;
 
 @Service
 public class PortalService {
@@ -29,9 +30,24 @@ public class PortalService {
                 .orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 
         Portal portal = portalMapper.toEntity(portalCreationDTO);
-        portal.setCreator(creator);
+        creator.addPortal(portal);
 
         Portal savedPortal = portalRepository.save(portal);
         return portalMapper.toDTO(savedPortal);
+    }
+
+    @Transactional
+    public void deletePortal(Long portalId, Long creatorId) {
+        Portal portal = portalRepository.findById(portalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Portal Not Found"));
+
+        if (!portal.getCreator().getId().equals(creatorId)) {
+            throw new ForbiddenOperationException("User Not Authorized to Delete this Portal");
+        }
+
+        User creator = portal.getCreator();
+        creator.removePortal(portal);
+
+        portalRepository.delete(portal);
     }
 }
