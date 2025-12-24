@@ -264,23 +264,47 @@ async function handleSubmit(event) {
         } else {
             let errorMessage = 'Login Failed. Please Try Again.';
 
+            // Clone response so we can read it as text if JSON parsing fails
+            const responseClone = response.clone();
+
             try {
                 const errorData = await response.json();
-                if (errorData.message) {
+
+                // Handle ValidationErrorResponse (has errors map)
+                if (errorData.errors && typeof errorData.errors === 'object') {
+                    // Map field errors to UI
+                    const fieldMapping = {
+                        'email': 'email',
+                        'plainPassword': 'plainPassword'
+                    };
+
+                    Object.entries(errorData.errors).forEach(([field, message]) => {
+                        const mappedField = fieldMapping[field];
+                        if (mappedField) {
+                            setFieldError(mappedField, message);
+                        }
+                    });
+
+                    errorMessage = errorData.message || 'Please Fix the Validation Errors';
+                }
+                // Handle ErrorResponse (has message only)
+                else if (errorData.message) {
                     errorMessage = errorData.message;
-                } else if (errorData.errors && Array.isArray(errorData.errors)) {
-                    errorMessage = errorData.errors.join(', ');
                 }
             } catch (e) {
-                // Response might not be JSON
-                const textError = await response.text();
-                if (textError) {
-                    errorMessage = textError;
+                // Response might not be JSON, use the cloned response
+                try {
+                    const textError = await responseClone.text();
+                    if (textError) {
+                        errorMessage = textError;
+                    }
+                } catch (textParseError) {
+                    // Keep default error message
                 }
             }
 
-            // Handle specific error cases
-            if (errorMessage.toLowerCase().includes('invalid email or password')) {
+            // Handle specific error cases based on HTTP status codes
+            if (response.status === 401) {
                 errorMessage = 'Invalid Email or Password';
             }
 

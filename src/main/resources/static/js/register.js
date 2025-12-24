@@ -305,26 +305,53 @@ async function handleSubmit(event) {
         } else {
             let errorMessage = 'Registration Failed. Please Try Again.';
 
+            // Clone response so we can read it as text if JSON parsing fails
+            const responseClone = response.clone();
+
             try {
                 const errorData = await response.json();
-                if (errorData.message) {
+
+                // Handle ValidationErrorResponse (has errors map)
+                if (errorData.errors && typeof errorData.errors === 'object') {
+                    // Map field errors to UI
+                    const fieldMapping = {
+                        'firstName': 'firstName',
+                        'lastName': 'lastName',
+                        'email': 'email',
+                        'plainPassword': 'plainPassword',
+                        'confirmPlainPassword': 'confirmPlainPassword'
+                    };
+
+                    Object.entries(errorData.errors).forEach(([field, message]) => {
+                        const mappedField = fieldMapping[field];
+                        if (mappedField) {
+                            setFieldError(mappedField, message);
+                        }
+                    });
+
+                    errorMessage = errorData.message || 'Please Fix the Validation Errors';
+                }
+                // Handle ErrorResponse (has message only)
+                else if (errorData.message) {
                     errorMessage = errorData.message;
-                } else if (errorData.errors && Array.isArray(errorData.errors)) {
-                    errorMessage = errorData.errors.join(', ');
                 }
             } catch (e) {
-                // Response might not be JSON
-                const textError = await response.text();
-                if (textError) {
-                    errorMessage = textError;
+                // Response might not be JSON, use the cloned response
+                try {
+                    const textError = await responseClone.text();
+                    if (textError) {
+                        errorMessage = textError;
+                    }
+                } catch (textParseError) {
+                    // Keep default error message
                 }
             }
 
-            // Handle specific error cases
-            if (response.status === 409 || errorMessage.toLowerCase().includes('email already exists')) {
+            // Handle specific error cases based on HTTP status codes
+            if (response.status === 409) {
                 setFieldError('email', 'This email is already registered');
                 errorMessage = 'An Account With this Email Already Exists';
-            } else if (errorMessage.toLowerCase().includes('passwords do not match')) {
+            } else if (response.status === 400 && errorMessage.toLowerCase().includes('passwords do not match')) {
                 setFieldError('confirmPlainPassword', 'Passwords Do Not Match');
             }
 
