@@ -4,11 +4,13 @@ import com.andydli.hivemind.exceptions.*;
 import org.springframework.stereotype.Service;
 import com.andydli.hivemind.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import com.andydli.hivemind.mapper.UserMapper;
 import com.andydli.hivemind.security.JwtService;
 import com.andydli.hivemind.model.User;
+import com.andydli.hivemind.mapper.UserMapper;
 import com.andydli.hivemind.dto.UserRegistrationDTO;
 import com.andydli.hivemind.dto.UserLoginDTO;
+import com.andydli.hivemind.model.Portal;
+import com.andydli.hivemind.dto.PortalCreationDTO;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -68,5 +70,10 @@ public class UserService {
         }
 
         return jwtService.generateToken(user.getId(), user.getEmail());
+    }
+
+    @Transactional
+    public Portal createPortal(PortalCreationDTO portalCreationDTO) {
+        return null;
     }
 }
