@@ -20,7 +20,7 @@ public class Portal {
     @Column(nullable = false, name = "topic", length = 100)
     private String topic;
 
-    @Column(name = "description", length = 1000)
+    @Column(nullable = false, name = "description", length = 1000)
     private String description;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
