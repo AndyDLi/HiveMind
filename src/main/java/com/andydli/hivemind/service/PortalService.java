@@ -41,12 +41,12 @@ public class PortalService {
         Portal portal = portalRepository.findById(portalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Portal Not Found"));
 
-        if (!portal.getCreator().getId().equals(creatorId)) {
+        User creator = portal.getCreator();
+        if (creator == null || !creator.getId().equals(creatorId)) {
             throw new ForbiddenOperationException("User Not Authorized to Delete this Portal");
         }
 
-        User creator = portal.getCreator();
-        creator.removePortal(portal);
+        creator.removePortal(portal); // redundant due to orphanRemoval, though no harm
 
         portalRepository.delete(portal);
     }
