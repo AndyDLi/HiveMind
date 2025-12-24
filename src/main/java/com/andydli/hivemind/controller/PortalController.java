@@ -12,7 +12,7 @@ import org.springframework.http.HttpStatus;
 
 
 @RestController
-@RequestMapping("/api/portal")
+@RequestMapping("/api/portals")
 public class PortalController {
     private final PortalService portalService;
 
@@ -20,7 +20,7 @@ public class PortalController {
         this.portalService = portalService;
     }
 
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<PortalDTO> createPortal(
             @Valid @RequestBody PortalCreationDTO portalCreationDTO,
             @AuthenticationPrincipal User user
