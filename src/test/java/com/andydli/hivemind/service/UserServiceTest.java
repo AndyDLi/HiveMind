@@ -1,5 +1,6 @@
 package com.andydli.hivemind.service;
 
+import com.andydli.hivemind.dto.UserDTO;
 import com.andydli.hivemind.dto.UserLoginDTO;
 import com.andydli.hivemind.dto.UserRegistrationDTO;
 import com.andydli.hivemind.exceptions.*;
@@ -17,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -93,6 +95,10 @@ public class UserServiceTest {
                 USER_UNNORMALIZED_EMAIL, USER_PLAIN_PASSWORD, USER_PLAIN_PASSWORD, USER_FIRST_NAME, USER_LAST_NAME
         );
 
+        UserDTO expectedDTO = new UserDTO(
+                USER_ID, USER_EMAIL, USER_FIRST_NAME, USER_LAST_NAME, Instant.now(), Instant.now()
+        );
+
         when(userMapper.toEntity(dto)).thenReturn(new User());
         when(passwordEncoder.encode(USER_PLAIN_PASSWORD)).thenReturn("hashedPassword");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
@@ -100,11 +106,12 @@ public class UserServiceTest {
            u.setId(USER_ID);
            return u;
         });
+        when(userMapper.toDTO(any(User.class))).thenReturn(expectedDTO);
 
-        User savedUser = userService.registerUser(dto);
+        UserDTO savedUserDTO = userService.registerUser(dto);
 
-        assertNotNull(savedUser, "Saved User Should Not Be Null");
-        assertEquals(USER_ID, savedUser.getId(), "Saved User Should Have Set ID");
+        assertNotNull(savedUserDTO, "Saved User Should Not Be Null");
+        assertEquals(USER_ID, savedUserDTO.id(), "Saved User Should Have Set ID");
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         verify(userRepository).save(captor.capture());
@@ -114,6 +121,7 @@ public class UserServiceTest {
         verify(userRepository).existsByEmail(USER_EMAIL);
         verify(userMapper).toEntity(dto);
         verify(passwordEncoder).encode(USER_PLAIN_PASSWORD);
+        verify(userMapper).toDTO(any(User.class));
     }
 
     @Test
