@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.ArrayList;
 import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -96,7 +97,7 @@ public class UserServiceTest {
         );
 
         UserDTO expectedDTO = new UserDTO(
-                USER_ID, USER_EMAIL, USER_FIRST_NAME, USER_LAST_NAME, Instant.now(), Instant.now()
+                USER_ID, USER_EMAIL, USER_FIRST_NAME, USER_LAST_NAME, new ArrayList<>(), null, Instant.now(), Instant.now()
         );
 
         when(userMapper.toEntity(dto)).thenReturn(new User());

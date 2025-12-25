@@ -8,6 +8,8 @@ import com.andydli.hivemind.model.User;
 import com.andydli.hivemind.dto.UserDTO;
 import com.andydli.hivemind.exceptions.ResourceNotFoundException;
 
+import java.util.ArrayList;
+
 @Component
 public class PortalMapper {
     public PortalDTO toDTO(Portal portal) {
@@ -25,6 +27,8 @@ public class PortalMapper {
                 creator.getEmail(),
                 creator.getFirstName(),
                 creator.getLastName(),
+                new ArrayList<>(), // empty list to avoid circular reference (not null for consistency)
+                null, // profile omitted to avoid circular reference
                 creator.getCreatedAt(),
                 creator.getUpdatedAt()
         );

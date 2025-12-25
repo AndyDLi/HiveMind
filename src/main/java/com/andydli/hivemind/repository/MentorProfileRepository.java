@@ -1,10 +1,10 @@
 package com.andydli.hivemind.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.andydli.hivemind.model.MentorProfile;
+import com.andydli.hivemind.model.Profile;
 
 import java.util.Optional;
 
-public interface MentorProfileRepository extends JpaRepository<MentorProfile, Long> {
-    Optional<MentorProfile> findByUser_Id(Long userId);
+public interface MentorProfileRepository extends JpaRepository<Profile, Long> {
+    Optional<Profile> findByUser_Id(Long userId);
 }
