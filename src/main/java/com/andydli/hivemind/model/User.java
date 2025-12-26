@@ -39,6 +39,9 @@ public class User {
     @JsonManagedReference
     private List<Portal> portals = new ArrayList<>();
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Profile profile;
+
     @Column(nullable = false, updatable = false, name = "created_at")
     private Instant createdAt;
 
@@ -82,6 +85,17 @@ public class User {
 
         this.portals.remove(portal);
         portal.setCreator(null);
+    }
+
+    public void setProfile(Profile profile) {
+        if (profile == null) {
+            if (this.profile != null) {
+                this.profile.setUser(null);
+            }
+        } else {
+            profile.setUser(this);
+        }
+        this.profile = profile;
     }
 
     @Override

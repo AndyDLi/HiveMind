@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -18,22 +17,22 @@ import java.util.Objects;
 @Getter
 @Setter
 @NoArgsConstructor
-@Table(name = "mentor_profiles")
-public class MentorProfile {
+@Table(name = "profiles")
+public class Profile {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
+    @MapsId // shares primary key with User
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
     @Column(length = 1500)
-    @Size(max = 1500, message = "Bio Cannot Exceed 1500 Characters")
     private String bio;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "mentor_skills", joinColumns = @JoinColumn(name = "mentor_profile_id"))
+    @CollectionTable(name = "skills", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "skill", nullable = false)
     private Set<String> skills = new HashSet<>();
 
@@ -68,7 +67,7 @@ public class MentorProfile {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (! (o instanceof MentorProfile other)) return false;
+        if (! (o instanceof Profile other)) return false;
         return this.id != null && this.id.equals(other.id);
     }
 
