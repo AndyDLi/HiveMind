@@ -46,7 +46,7 @@ public class PortalService {
             throw new ForbiddenOperationException("User Not Authorized to Delete this Portal");
         }
 
-        creator.removePortal(portal); // redundant due to cascade setting, though no harm
+        creator.removePortal(portal); // redundant due to orphanRemoval (and cascade) setting, though no harm
 
         portalRepository.delete(portal);
     }

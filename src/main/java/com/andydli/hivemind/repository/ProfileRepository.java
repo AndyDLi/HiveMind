@@ -5,6 +5,6 @@ import com.andydli.hivemind.model.Profile;
 
 import java.util.Optional;
 
-public interface MentorProfileRepository extends JpaRepository<Profile, Long> {
+public interface ProfileRepository extends JpaRepository<Profile, Long> {
     Optional<Profile> findByUser_Id(Long userId);
 }
