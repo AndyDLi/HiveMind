@@ -40,6 +40,7 @@ public class User {
     private List<Portal> portals = new ArrayList<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private Profile profile;
 
     @Column(nullable = false, updatable = false, name = "created_at")
