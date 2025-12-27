@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -23,9 +24,10 @@ public class Profile {
     @Column(name = "user_id")
     private Long id;
 
-    @MapsId // shares primary key with User
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @MapsId // shares primary key with User
+    @JsonBackReference
     private User user;
 
     @Column(length = 1500)

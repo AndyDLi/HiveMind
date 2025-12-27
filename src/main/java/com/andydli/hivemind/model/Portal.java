@@ -25,7 +25,7 @@ public class Portal {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "creator_id", nullable = false) // portal owns the relationship
-    @JsonBackReference
+    @JsonBackReference // prevents infinite recursion during serialization
     private User creator;
 
     @Column(nullable = false, updatable = false, name = "created_at")
