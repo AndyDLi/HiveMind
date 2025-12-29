@@ -16,7 +16,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.HttpHeaders;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;

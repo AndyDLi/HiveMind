@@ -23,6 +23,12 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 
+    @ExceptionHandler(ProfileAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleProfileAlreadyExists(ProfileAlreadyExistsException ex) {
+        ErrorResponse error = createErrorResponse(HttpStatus.CONFLICT, ex.getMessage()); // 409
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    }
+
     @ExceptionHandler(PasswordMismatchException.class)
     public ResponseEntity<ErrorResponse> handlePasswordMismatch(PasswordMismatchException ex) {
         ErrorResponse error = createErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage()); // 400
