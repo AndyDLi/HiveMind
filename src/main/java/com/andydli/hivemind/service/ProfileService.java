@@ -20,23 +20,21 @@ public class ProfileService {
         this.profileMapper = profileMapper;
     }
 
-    @Transactional
-    public ProfileDTO getOrCreateProfile(Long userId) {
+    @Transactional(readOnly = true)
+    public ProfileDTO getProfile(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 
         Profile profile = user.getProfile();
         if (profile == null) {
-            profile = new Profile();
-            user.setProfile(profile);
-            userRepository.save(user);
+            throw new ResourceNotFoundException("Profile Not Found");
         }
 
         return profileMapper.toDTO(profile);
     }
 
     @Transactional
-    public ProfileDTO updateProfile(Long userId, ProfileRequestDTO profileRequestDTO) {
+    public ProfileDTO createOrUpdateProfile(Long userId, ProfileRequestDTO profileRequestDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 
