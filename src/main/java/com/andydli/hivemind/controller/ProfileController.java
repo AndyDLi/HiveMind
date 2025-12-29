@@ -30,7 +30,7 @@ public class ProfileController {
             @Valid @RequestBody ProfileRequestDTO profileRequestDTO,
             @AuthenticationPrincipal User user
     ) {
-        ProfileDTO profileDTO = profileService.createOrUpdateProfile(user.getId(), profileRequestDTO);
+        ProfileDTO profileDTO = profileService.createProfile(user.getId(), profileRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(profileDTO);
     }
 
@@ -39,7 +39,7 @@ public class ProfileController {
             @Valid @RequestBody ProfileRequestDTO profileRequestDTO,
             @AuthenticationPrincipal User user
     ) {
-        ProfileDTO profileDTO = profileService.createOrUpdateProfile(user.getId(), profileRequestDTO);
+        ProfileDTO profileDTO = profileService.updateProfile(user.getId(), profileRequestDTO);
         return ResponseEntity.ok(profileDTO);
     }
 }

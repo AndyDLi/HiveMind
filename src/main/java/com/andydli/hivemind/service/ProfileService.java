@@ -9,6 +9,7 @@ import com.andydli.hivemind.dto.ProfileDTO;
 import com.andydli.hivemind.dto.ProfileRequestDTO;
 import com.andydli.hivemind.model.User;
 import com.andydli.hivemind.exceptions.ResourceNotFoundException;
+import com.andydli.hivemind.exceptions.ProfileAlreadyExistsException;
 
 @Service
 public class ProfileService {
@@ -34,14 +35,31 @@ public class ProfileService {
     }
 
     @Transactional
-    public ProfileDTO createOrUpdateProfile(Long userId, ProfileRequestDTO profileRequestDTO) {
+    public ProfileDTO createProfile(Long userId, ProfileRequestDTO profileRequestDTO) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+
+        if (user.getProfile() != null) {
+            throw new ProfileAlreadyExistsException("Profile Already Exists for this User");
+        }
+
+        Profile profile = new Profile();
+        user.setProfile(profile);
+        profile.setBio(profileRequestDTO.bio());
+        profile.setSkills(profileRequestDTO.skills());
+
+        User savedUser = userRepository.save(user);
+        return profileMapper.toDTO(savedUser.getProfile());
+    }
+
+    @Transactional
+    public ProfileDTO updateProfile(Long userId, ProfileRequestDTO profileRequestDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
 
         Profile profile = user.getProfile();
         if (profile == null) {
-            profile = new Profile();
-            user.setProfile(profile);
+            throw new ResourceNotFoundException("Profile Not Found. Create One First");
         }
 
         profile.setBio(profileRequestDTO.bio());
