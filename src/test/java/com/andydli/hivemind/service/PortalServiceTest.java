@@ -56,8 +56,8 @@ public class PortalServiceTest {
     private static final String PORTAL_DESCRIPTION = "Test Description";
 
     @Test
-    @DisplayName("Creating Portal When User Exists Should Save Portal and Establish Bi-Directional Relationship")
-    void createPortal_whenUserExists_shouldSavePortalAndEstablishBiDirectionalRelationship() {
+    @DisplayName("Creating Portal When User Exists Should Save Portal and Establish Bidirectional Relationship")
+    void createPortal_whenUserExists_shouldSavePortalAndEstablishBidirectionalRelationship() {
         PortalCreationDTO portalCreationDTO = new PortalCreationDTO(PORTAL_TOPIC, PORTAL_DESCRIPTION);
 
         Portal newPortal = new Portal();
@@ -76,10 +76,6 @@ public class PortalServiceTest {
 
         assertNotNull(result, "Created Portal Should Not Be Null");
         assertEquals(expectedPortalDTO, result, "Created Portal Should Match Expected");
-        assertEquals(PORTAL_ID, result.id(), "Created Portal Should Have Set ID");
-        assertEquals(PORTAL_TOPIC, result.topic(), "Portal Topic Should Match");
-        assertEquals(PORTAL_DESCRIPTION, result.description(), "Portal Description Should Match");
-        assertEquals(userDTO, result.creator(), "Portal Creator Should Match");
 
         ArgumentCaptor<Portal> captor = ArgumentCaptor.forClass(Portal.class);
         verify(userRepository).findById(USER_ID);
@@ -111,8 +107,8 @@ public class PortalServiceTest {
     }
 
     @Test
-    @DisplayName("Deleting Valid Portal Should Delete Portal and Remove Bi-Directional Relationship")
-    void deletePortal_whenValidPortal_shouldDeletePortalAndRemoveBiDirectionalRelationship() {
+    @DisplayName("Deleting Valid Portal Should Delete Portal and Remove Bidirectional Relationship")
+    void deletePortal_whenValidPortal_shouldDeletePortalAndRemoveBidirectionalRelationship() {
         when(portalRepository.findById(PORTAL_ID)).thenReturn(Optional.of(portal));
         when(portal.getCreator()).thenReturn(user);
         when(user.getId()).thenReturn(USER_ID);
