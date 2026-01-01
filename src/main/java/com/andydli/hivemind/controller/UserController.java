@@ -46,11 +46,11 @@ public class UserController {
         String token = userService.authenticateUser(userLoginDTO);
         // store token in httpOnly cookie
         ResponseCookie jwtCookie = ResponseCookie.from("token", token)
-                .httpOnly(true)
-                .secure(false) // set to true in production with HTTPS
+                .httpOnly(true) // prevents cookie hijacking via XSS
+                .secure(false) // set to true in prod to only send cookies over HTTPS
                 .path("/")
                 .maxAge(24 * 60 * 60)
-                .sameSite("Lax") // "Lax" for localhost, "Strict" for production
+                .sameSite("Lax") // don't send cookie on cross-site requests; change to "Strict" in prod
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, jwtCookie.toString());
         return ResponseEntity.ok().build();
