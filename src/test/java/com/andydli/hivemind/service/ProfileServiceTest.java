@@ -41,7 +41,7 @@ public class ProfileServiceTest {
     @Mock
     private Profile profile;
 
-    private final static Long USER_ID = 1L;
+    private static final Long USER_ID = 1L;
 
     private static final Long PROFILE_ID = 10L;
     private static final String PROFILE_BIO = "Test Bio";
