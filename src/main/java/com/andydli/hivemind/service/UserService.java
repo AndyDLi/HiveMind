@@ -31,6 +31,13 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
+    @Transactional(readOnly = true)
+    public UserDTO getCurrentUser(Long userId) {
+        User user = userRepository.findByIdWithRelationships(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User Not Found"));
+        return userMapper.toDTO(user);
+    }
+
     @Transactional
     public UserDTO registerUser(UserRegistrationDTO userRegistrationDTO) {
         // confirm passwords match

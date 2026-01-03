@@ -2,7 +2,6 @@ package com.andydli.hivemind.controller;
 
 import org.springframework.web.bind.annotation.*;
 import com.andydli.hivemind.service.UserService;
-import com.andydli.hivemind.mapper.UserMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import jakarta.validation.Valid;
@@ -19,16 +18,14 @@ import org.springframework.http.HttpHeaders;
 @RequestMapping("/api/users")
 public class UserController {
     private final UserService userService;
-    private final UserMapper userMapper;
 
-    public UserController(UserService userService, UserMapper userMapper) {
+    public UserController(UserService userService) {
         this.userService = userService;
-        this.userMapper = userMapper;
     }
 
     @GetMapping("/me")
     public ResponseEntity<UserDTO> getCurrentUser(@AuthenticationPrincipal User user) {
-        UserDTO userDTO = userMapper.toDTO(user);
+        UserDTO userDTO = userService.getCurrentUser(user.getId());
         return ResponseEntity.ok(userDTO);
     }
 

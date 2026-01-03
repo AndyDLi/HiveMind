@@ -19,7 +19,6 @@ import tools.jackson.databind.ObjectMapper;
 import org.springframework.test.web.servlet.MockMvc;
 import org.junit.jupiter.api.BeforeEach;
 import com.andydli.hivemind.service.UserService;
-import com.andydli.hivemind.mapper.UserMapper;
 import com.andydli.hivemind.model.User;
 import com.andydli.hivemind.dto.UserDTO;
 import com.andydli.hivemind.dto.UserRegistrationDTO;
@@ -57,9 +56,6 @@ public class UserControllerTest {
         @MockitoBean // mock UserService bean and inject into Spring ApplicationContext
         private UserService userService;
 
-        @MockitoBean
-        private UserMapper userMapper;
-
         private MockMvc mockMvc;
 
         private static final Long USER_ID = 1L;
@@ -91,7 +87,7 @@ public class UserControllerTest {
                 mockUser.setLastName(LAST_NAME);
 
                 UserDTO mockUserDTO = new UserDTO(USER_ID, USER_EMAIL, FIRST_NAME, LAST_NAME, USER_PORTALS, null, Instant.now(), Instant.now());
-                when(userMapper.toDTO(mockUser)).thenReturn(mockUserDTO);
+                when(userService.getCurrentUser(USER_ID)).thenReturn(mockUserDTO);
 
                 // create authentication token with mockUser as principal
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(mockUser, null, List.of());
