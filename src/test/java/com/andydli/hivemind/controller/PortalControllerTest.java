@@ -62,7 +62,6 @@ public class PortalControllerTest {
     private static final String USER_LAST_NAME = "User";
     private static final List<PortalDTO> USER_PORTALS = List.of();
 
-
     private static final Long PORTAL_ID = 1L;
     private static final Long INVALID_PORTAL_ID = 2L;
     private static final String INVALID_PORTAL_ID_TYPE = "invalid-id";
