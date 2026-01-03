@@ -1,6 +1,7 @@
 package com.andydli.hivemind.exceptions;
 
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.http.HttpStatus;
@@ -54,6 +55,14 @@ public class GlobalExceptionHandler {
     }
 
     // additional exception handlers
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        log.warn("Type Mismatch for Parameter '{}': {}", ex.getName(), ex.getValue());
+        String message = String.format("Parameter '%s' Must Be of Type '%s'", ex.getName(), ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "Unknown");
+        ErrorResponse error = createErrorResponse(HttpStatus.BAD_REQUEST, message); // 400
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleValidationError(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
