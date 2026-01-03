@@ -109,21 +109,6 @@ public class ProfileControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/profiles/me - User Not Found Returns 404")
-    void getProfile_whenUserNotFound_returns404() throws Exception {
-        User mockUser = new User();
-        mockUser.setId(USER_ID);
-
-        when(profileService.getProfile(USER_ID)).thenThrow(new ResourceNotFoundException("User Not Found"));
-
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(mockUser, null, List.of());
-
-        mockMvc.perform(get("/api/profiles/me")
-                .with(authentication(auth)))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
     @DisplayName("GET /api/profiles/me - Profile Not Found Returns 404")
     void getProfile_whenProfileNotFound_returns404() throws Exception {
         User mockUser = new User();
@@ -288,25 +273,6 @@ public class ProfileControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(emptyJson))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("PUT /api/profiles/me - User Not Found Returns 404")
-    void updateProfile_whenUserNotFound_returns404() throws Exception {
-        User mockUser = new User();
-        mockUser.setId(USER_ID);
-
-        ProfileRequestDTO profileRequestDTO = new ProfileRequestDTO(UPDATED_PROFILE_BIO, UPDATED_PROFILE_SKILLS);
-
-        when(profileService.updateProfile(USER_ID, profileRequestDTO)).thenThrow(new ResourceNotFoundException("User Not Found"));
-
-        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(mockUser, null, List.of());
-
-        mockMvc.perform(put("/api/profiles/me")
-                .with(authentication(auth))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(profileRequestDTO)))
-                .andExpect(status().isNotFound());
     }
 
     @Test
