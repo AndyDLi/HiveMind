@@ -97,7 +97,7 @@ public class UserControllerTest {
                 UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(mockUser, null, List.of());
 
                 mockMvc.perform(get("/api/users/me")
-                                .with(authentication(auth)))
+                        .with(authentication(auth)))
                         .andExpect(status().isOk())
                         .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                         .andExpect(jsonPath("$.id").value(USER_ID))
