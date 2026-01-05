@@ -9,6 +9,6 @@ import java.util.List;
 public interface PortalRepository extends JpaRepository<Portal, Long> {
     List<Portal> findByCreatorId(Long creatorId);
 
-    @Query("SELECT p FROM Portal p LEFT JOIN FETCH p.creator ORDER BY p.createdAt DESC")
+    @Query("SELECT p FROM Portal p JOIN FETCH p.creator ORDER BY p.createdAt DESC")
     List<Portal> findAllWithCreators();
 }

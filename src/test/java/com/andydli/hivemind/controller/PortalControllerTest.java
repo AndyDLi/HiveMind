@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import com.andydli.hivemind.model.User;
-import com.andydli.hivemind.dto.UserDTO;
+import com.andydli.hivemind.dto.UserPublicDTO;
 import com.andydli.hivemind.service.PortalService;
 import com.andydli.hivemind.dto.PortalDTO;
 import com.andydli.hivemind.dto.PortalCreationDTO;
@@ -29,6 +29,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.authentication;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -77,6 +78,68 @@ public class PortalControllerTest {
     }
 
     @Test
+    @DisplayName("GET /api/portals - Authenticated User Returns List of PortalDTOs and 200")
+    void getAllPortals_whenAuthenticated_shouldReturnListOfPortalDTOs_and200() throws Exception {
+        User mockUser = new User();
+        mockUser.setId(USER_ID);
+        mockUser.setEmail(USER_EMAIL);
+        mockUser.setFirstName(USER_FIRST_NAME);
+        mockUser.setLastName(USER_LAST_NAME);
+
+        UserPublicDTO userPublicDTO = new UserPublicDTO(USER_ID, USER_FIRST_NAME, USER_LAST_NAME, USER_PORTALS, null, Instant.now(), Instant.now());
+        PortalDTO portalDTO1 = new PortalDTO(PORTAL_ID, PORTAL_TOPIC, PORTAL_DESCRIPTION, userPublicDTO, Instant.now(), Instant.now());
+        PortalDTO portalDTO2 = new PortalDTO(PORTAL_ID + 1, "Second Topic", "Second Description", userPublicDTO, Instant.now(), Instant.now());
+
+        when(portalService.getAllPortals()).thenReturn(List.of(portalDTO1, portalDTO2));
+
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(mockUser, null, List.of());
+
+        mockMvc.perform(get("/api/portals")
+                .with(authentication(auth))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].id").value(PORTAL_ID))
+                .andExpect(jsonPath("$[0].topic").value(PORTAL_TOPIC))
+                .andExpect(jsonPath("$[0].description").value(PORTAL_DESCRIPTION))
+                .andExpect(jsonPath("$[0].creator.id").value(USER_ID))
+                .andExpect(jsonPath("$[0].creator.email").doesNotExist())
+                .andExpect(jsonPath("$[0].creator.firstName").value(USER_FIRST_NAME))
+                .andExpect(jsonPath("$[0].creator.lastName").value(USER_LAST_NAME))
+                .andExpect(jsonPath("$[1].id").value(PORTAL_ID + 1))
+                .andExpect(jsonPath("$[1].topic").value("Second Topic"));
+    }
+
+    @Test
+    @DisplayName("GET /api/portals - Unauthenticated User Returns 403")
+    void getAllPortals_whenUnauthenticated_shouldReturn403() throws Exception {
+        mockMvc.perform(get("/api/portals")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("GET /api/portals - Returns Empty List When No Portals Exist")
+    void getAllPortals_whenNoPortalsExist_shouldReturnEmptyList_and200() throws Exception {
+        User mockUser = new User();
+        mockUser.setId(USER_ID);
+
+        when(portalService.getAllPortals()).thenReturn(List.of());
+
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(mockUser, null, List.of());
+
+        mockMvc.perform(get("/api/portals")
+                .with(authentication(auth))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(0));
+    }
+
+    @Test
     @DisplayName("POST /api/portals - Valid Portal Creation Returns PortalDTO and 201")
     void createPortal_whenValidRequest_shouldReturnPortalDTO_and201() throws Exception {
         User mockUser = new User();
@@ -86,8 +149,8 @@ public class PortalControllerTest {
         mockUser.setLastName(USER_LAST_NAME);
 
         PortalCreationDTO portalCreationDTO = new PortalCreationDTO(PORTAL_TOPIC, PORTAL_DESCRIPTION);
-        UserDTO userDTO = new UserDTO(USER_ID, USER_EMAIL, USER_FIRST_NAME, USER_LAST_NAME, USER_PORTALS, null, Instant.now(), Instant.now());
-        PortalDTO expectedPortalDTO = new PortalDTO(PORTAL_ID, PORTAL_TOPIC, PORTAL_DESCRIPTION, userDTO, Instant.now(), Instant.now());
+        UserPublicDTO userPublicDTO = new UserPublicDTO(USER_ID, USER_FIRST_NAME, USER_LAST_NAME, USER_PORTALS, null, Instant.now(), Instant.now());
+        PortalDTO expectedPortalDTO = new PortalDTO(PORTAL_ID, PORTAL_TOPIC, PORTAL_DESCRIPTION, userPublicDTO, Instant.now(), Instant.now());
 
         when(portalService.createPortal(portalCreationDTO, USER_ID)).thenReturn(expectedPortalDTO);
 
@@ -103,7 +166,7 @@ public class PortalControllerTest {
                 .andExpect(jsonPath("$.topic").value(PORTAL_TOPIC))
                 .andExpect(jsonPath("$.description").value(PORTAL_DESCRIPTION))
                 .andExpect(jsonPath("$.creator.id").value(USER_ID))
-                .andExpect(jsonPath("$.creator.email").value(USER_EMAIL))
+                .andExpect(jsonPath("$.creator.email").doesNotExist())
                 .andExpect(jsonPath("$.creator.firstName").value(USER_FIRST_NAME))
                 .andExpect(jsonPath("$.creator.lastName").value(USER_LAST_NAME))
                 .andExpect(jsonPath("$.creator.portals").isArray())
