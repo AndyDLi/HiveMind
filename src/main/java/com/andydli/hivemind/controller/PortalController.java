@@ -10,6 +10,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import com.andydli.hivemind.model.User;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/portals")
 public class PortalController {
@@ -17,6 +19,12 @@ public class PortalController {
 
     public PortalController(PortalService portalService) {
         this.portalService = portalService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PortalDTO>> getAllPortals() {
+        List<PortalDTO> portals = portalService.getAllPortals();
+        return ResponseEntity.ok(portals);
     }
 
     @PostMapping

@@ -8,6 +8,7 @@ let currentUser = null;
 let userProfile = null;
 let editSkills = [];
 let portalToDelete = null;
+let allPortals = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     initParticles();
@@ -153,7 +154,7 @@ function updateUIWithUserData() {
                 .map(skill => `<span class="skill-tag">${escapeHtml(skill)}</span>`)
                 .join('');
         } else {
-            skillsList.innerHTML = '<span class="no-skills">No skills added yet</span>';
+            skillsList.innerHTML = '<span class="no-skills">No Skills Added Yet</span>';
         }
     }
 
@@ -164,35 +165,59 @@ function updateUIWithUserData() {
 /* ============================================
    Load Portals
    ============================================ */
-function loadPortals() {
+async function loadPortals() {
     const portalsGrid = document.getElementById('portalsGrid');
     const loadingState = document.getElementById('portalsLoading');
     const emptyState = document.getElementById('portalsEmpty');
 
-    // Hide loading
-    loadingState.style.display = 'none';
-
-    if (!currentUser || !currentUser.portals || currentUser.portals.length === 0) {
-        emptyState.style.display = 'flex';
-        return;
-    }
-
+    // Show loading state
+    loadingState.style.display = 'flex';
     emptyState.style.display = 'none';
 
-    // Clear existing portal cards (except loading and empty states)
-    const existingCards = portalsGrid.querySelectorAll('.portal-card');
-    existingCards.forEach(card => card.remove());
+    try {
+        const response = await fetch('/api/portals', {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
 
-    // Sort portals by creation date (newest first)
-    const sortedPortals = [...currentUser.portals].sort((a, b) =>
-        new Date(b.createdAt) - new Date(a.createdAt)
-    );
+        if (response.ok) {
+            allPortals = await response.json();
 
-    // Render portal cards
-    sortedPortals.forEach((portal, index) => {
-        const card = createPortalCard(portal, index);
-        portalsGrid.appendChild(card);
-    });
+            // Hide loading
+            loadingState.style.display = 'none';
+
+            if (!allPortals || allPortals.length === 0) {
+                emptyState.style.display = 'flex';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            // Clear existing portal cards (except loading and empty states)
+            const existingCards = portalsGrid.querySelectorAll('.portal-card');
+            existingCards.forEach(card => card.remove());
+
+            // Portals are already sorted by createdAt DESC from the backend
+            // Render portal cards
+            allPortals.forEach((portal, index) => {
+                const card = createPortalCard(portal, index);
+                portalsGrid.appendChild(card);
+            });
+        } else if (response.status === 401 || response.status === 403) {
+            // Not authenticated, redirect to login
+            window.location.href = '/login';
+        } else {
+            loadingState.style.display = 'none';
+            showToast('Failed to Load Portals', 'error');
+        }
+    } catch (error) {
+        console.error('Error Loading Portals:', error);
+        loadingState.style.display = 'none';
+        showToast('Unable to Connect to Server', 'error');
+    }
 }
 
 function createPortalCard(portal, index) {
@@ -215,15 +240,21 @@ function createPortalCard(portal, index) {
         year: 'numeric'
     });
 
-    card.innerHTML = `
-        <div class="portal-header">
-            <h3 class="portal-topic">${escapeHtml(portal.topic)}</h3>
+    // Only show delete button if current user is the creator
+    const isOwner = portal.creator && currentUser && portal.creator.id === currentUser.id;
+    const deleteButtonHtml = isOwner ? `
             <button class="portal-delete-btn" title="Delete Portal" data-portal-id="${portal.id}" data-portal-topic="${escapeHtml(portal.topic)}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6"/>
                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                 </svg>
             </button>
+        ` : '';
+
+    card.innerHTML = `
+        <div class="portal-header">
+            <h3 class="portal-topic">${escapeHtml(portal.topic)}</h3>
+            ${deleteButtonHtml}
         </div>
         <p class="portal-description">${escapeHtml(portal.description)}</p>
         <div class="portal-footer">
@@ -235,12 +266,14 @@ function createPortalCard(portal, index) {
         </div>
     `;
 
-    // Add delete button listener
-    const deleteBtn = card.querySelector('.portal-delete-btn');
-    deleteBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openDeleteModal(portal.id, portal.topic);
-    });
+    // Add delete button listener only if owner
+    if (isOwner) {
+        const deleteBtn = card.querySelector('.portal-delete-btn');
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openDeleteModal(portal.id, portal.topic);
+        });
+    }
 
     return card;
 }

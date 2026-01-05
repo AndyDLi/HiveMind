@@ -12,6 +12,9 @@ import com.andydli.hivemind.model.User;
 import com.andydli.hivemind.exceptions.ResourceNotFoundException;
 import com.andydli.hivemind.exceptions.ForbiddenOperationException;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class PortalService {
     private final UserRepository userRepository;
@@ -22,6 +25,14 @@ public class PortalService {
         this.userRepository = userRepository;
         this.portalMapper = portalMapper;
         this.portalRepository = portalRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<PortalDTO> getAllPortals() {
+        List<Portal> portals = portalRepository.findAllWithCreators();
+        return portals.stream()
+                .map(portalMapper::toDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
