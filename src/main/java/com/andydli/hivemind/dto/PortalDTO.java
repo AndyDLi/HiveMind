@@ -6,7 +6,7 @@ public record PortalDTO(
         Long id,
         String topic,
         String description,
-        UserDTO creator,
+        UserPublicDTO creator,
         Instant createdAt,
         Instant updatedAt
 ) {}

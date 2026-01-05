@@ -14,12 +14,13 @@ import com.andydli.hivemind.dto.PortalDTO;
 import com.andydli.hivemind.dto.PortalCreationDTO;
 import com.andydli.hivemind.mapper.PortalMapper;
 import com.andydli.hivemind.model.User;
-import com.andydli.hivemind.dto.UserDTO;
+import com.andydli.hivemind.dto.UserPublicDTO;
 import com.andydli.hivemind.exceptions.ResourceNotFoundException;
 import com.andydli.hivemind.exceptions.ForbiddenOperationException;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.List;
 import java.time.Instant;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -47,13 +48,61 @@ public class PortalServiceTest {
 
     private static final Long USER_ID = 1L;
     private static final Long UNAUTHORIZED_USER_ID = 2L;
-    private static final String USER_EMAIL = "test@example.com";
     private static final String USER_FIRST_NAME = "Test";
     private static final String USER_LAST_NAME = "User";
 
     private static final Long PORTAL_ID = 100L;
     private static final String PORTAL_TOPIC = "Test Portal";
     private static final String PORTAL_DESCRIPTION = "Test Description";
+
+    @Test
+    @DisplayName("Getting All Portals Should Return List of PortalDTOs")
+    void getAllPortals_shouldReturnListOfPortalDTOs() {
+        Portal portal1 = new Portal();
+        portal1.setId(PORTAL_ID);
+        portal1.setTopic(PORTAL_TOPIC);
+        portal1.setDescription(PORTAL_DESCRIPTION);
+
+        Portal portal2 = new Portal();
+        portal2.setId(PORTAL_ID + 1);
+        portal2.setTopic("Second Portal");
+        portal2.setDescription("Second Description");
+
+        List<Portal> portals = List.of(portal1, portal2);
+
+        UserPublicDTO userPublicDTO = new UserPublicDTO(USER_ID, USER_FIRST_NAME, USER_LAST_NAME, new ArrayList<>(), null, Instant.now(), Instant.now());
+        PortalDTO portalDTO1 = new PortalDTO(PORTAL_ID, PORTAL_TOPIC, PORTAL_DESCRIPTION, userPublicDTO, Instant.now(), Instant.now());
+        PortalDTO portalDTO2 = new PortalDTO(PORTAL_ID + 1, "Second Portal", "Second Description", userPublicDTO, Instant.now(), Instant.now());
+
+        when(portalRepository.findAllWithCreators()).thenReturn(portals);
+        when(portalMapper.toDTO(portal1)).thenReturn(portalDTO1);
+        when(portalMapper.toDTO(portal2)).thenReturn(portalDTO2);
+
+        List<PortalDTO> result = portalService.getAllPortals();
+
+        assertNotNull(result, "Result Should Not Be Null");
+        assertEquals(2, result.size(), "Should Return Two Portals");
+        assertEquals(portalDTO1, result.get(0), "First Portal Should Match");
+        assertEquals(portalDTO2, result.get(1), "Second Portal Should Match");
+
+        verify(portalRepository).findAllWithCreators();
+        verify(portalMapper).toDTO(portal1);
+        verify(portalMapper).toDTO(portal2);
+    }
+
+    @Test
+    @DisplayName("Getting All Portals When No Portals Exist Should Return Empty List")
+    void getAllPortals_whenNoPortalsExist_shouldReturnEmptyList() {
+        when(portalRepository.findAllWithCreators()).thenReturn(new ArrayList<>());
+
+        List<PortalDTO> result = portalService.getAllPortals();
+
+        assertNotNull(result, "Result Should Not Be Null");
+        assertTrue(result.isEmpty(), "Result Should Be Empty");
+
+        verify(portalRepository).findAllWithCreators();
+        verify(portalMapper, never()).toDTO(any());
+    }
 
     @Test
     @DisplayName("Creating Portal When User Exists Should Save Portal and Establish Bidirectional Relationship")
@@ -64,8 +113,8 @@ public class PortalServiceTest {
         Portal savedPortal = new Portal();
         savedPortal.setId(PORTAL_ID);
 
-        UserDTO userDTO = new UserDTO(USER_ID, USER_EMAIL, USER_FIRST_NAME, USER_LAST_NAME, new ArrayList<>(), null, Instant.now(), Instant.now());
-        PortalDTO expectedPortalDTO = new PortalDTO(PORTAL_ID, PORTAL_TOPIC, PORTAL_DESCRIPTION, userDTO, Instant.now(), Instant.now());
+        UserPublicDTO userPublicDTO = new UserPublicDTO(USER_ID, USER_FIRST_NAME, USER_LAST_NAME, new ArrayList<>(), null, Instant.now(), Instant.now());
+        PortalDTO expectedPortalDTO = new PortalDTO(PORTAL_ID, PORTAL_TOPIC, PORTAL_DESCRIPTION, userPublicDTO, Instant.now(), Instant.now());
 
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(user));
         when(portalMapper.toEntity(portalCreationDTO)).thenReturn(newPortal);

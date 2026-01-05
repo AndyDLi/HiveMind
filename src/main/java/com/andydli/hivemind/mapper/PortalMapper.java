@@ -5,7 +5,7 @@ import com.andydli.hivemind.model.Portal;
 import com.andydli.hivemind.dto.PortalDTO;
 import com.andydli.hivemind.dto.PortalCreationDTO;
 import com.andydli.hivemind.model.User;
-import com.andydli.hivemind.dto.UserDTO;
+import com.andydli.hivemind.dto.UserPublicDTO;
 import com.andydli.hivemind.exceptions.ResourceNotFoundException;
 
 import java.util.ArrayList;
@@ -22,9 +22,8 @@ public class PortalMapper {
             throw new ResourceNotFoundException("Portal Creator Not Found");
         }
 
-        UserDTO userDTO = new UserDTO(
+        UserPublicDTO userPublicDTO = new UserPublicDTO(
                 creator.getId(),
-                creator.getEmail(),
                 creator.getFirstName(),
                 creator.getLastName(),
                 new ArrayList<>(), // empty list to avoid circular reference (not null for consistency)
@@ -37,7 +36,7 @@ public class PortalMapper {
                 portal.getId(),
                 portal.getTopic(),
                 portal.getDescription(),
-                userDTO,
+                userPublicDTO,
                 portal.getCreatedAt(),
                 portal.getUpdatedAt()
         );
