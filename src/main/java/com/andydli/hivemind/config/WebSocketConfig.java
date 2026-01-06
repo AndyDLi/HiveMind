@@ -18,7 +18,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws") // initial handshake endpoint
-                .setAllowedOriginPatterns("*") // use patterns instead of origins to allow credentials
+                .setAllowedOriginPatterns("*") // adjust to allowed origins in production
                 .withSockJS();
     }
 }
