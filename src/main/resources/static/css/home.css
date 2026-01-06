@@ -524,6 +524,37 @@ body {
     }
 }
 
+/* Real-time portal animations */
+.portal-card-new {
+    animation: portalSlideIn 0.5s ease-out;
+}
+
+@keyframes portalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.portal-card-removing {
+    animation: portalFadeOut 0.3s ease-out forwards;
+}
+
+@keyframes portalFadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
 .portal-card:hover {
     border-color: var(--color-cyan);
     transform: translateY(-4px);

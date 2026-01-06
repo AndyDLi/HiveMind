@@ -9,6 +9,7 @@ let userProfile = null;
 let editSkills = [];
 let portalToDelete = null;
 let allPortals = [];
+let stompClient = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     initParticles();
@@ -117,6 +118,7 @@ async function loadUserData() {
             currentUser = await response.json();
             updateUIWithUserData();
             loadPortals();
+            connectWebSocket();
         } else if (response.status === 401 || response.status === 403) {
             // Not authenticated, redirect to login
             window.location.href = '/login';
@@ -126,6 +128,137 @@ async function loadUserData() {
     } catch (error) {
         console.error('Error Loading User Data:', error);
         showToast('Unable to Connect to Server', 'error');
+    }
+}
+
+/* ============================================
+   WebSocket Connection
+   ============================================ */
+function connectWebSocket() {
+    const socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+
+    // Disable debug logging in production
+    stompClient.debug = null;
+
+    stompClient.connect({}, onWebSocketConnected, onWebSocketError);
+}
+
+function onWebSocketConnected() {
+    console.log('WebSocket Connected');
+
+    // Subscribe to portal events
+    stompClient.subscribe('/topic/portals', onPortalEvent);
+}
+
+function onWebSocketError(error) {
+    console.error('WebSocket Error:', error);
+    // Attempt reconnection after 5 seconds
+    setTimeout(() => {
+        console.log('Attempting WebSocket Reconnection...');
+        connectWebSocket();
+    }, 5000);
+}
+
+function onPortalEvent(message) {
+    try {
+        const event = JSON.parse(message.body);
+        const eventType = event.eventType;
+        const portal = event.portalDTO;
+
+        if (eventType === 'CREATED') {
+            handlePortalCreatedEvent(portal);
+        } else if (eventType === 'DELETED') {
+            handlePortalDeletedEvent(portal);
+        }
+    } catch (error) {
+        console.error('Error Processing Portal Event:', error);
+    }
+}
+
+function handlePortalCreatedEvent(portal) {
+    // Check if portal already exists (avoid duplicates from own actions)
+    const existingPortal = allPortals.find(p => p.id === portal.id);
+    if (existingPortal) return;
+
+    // Add to beginning of array (newest first)
+    allPortals.unshift(portal);
+
+    // Update UI
+    const portalsGrid = document.getElementById('portalsGrid');
+    const emptyState = document.getElementById('portalsEmpty');
+
+    // Hide empty state if showing
+    emptyState.style.display = 'none';
+
+    // Create and prepend new portal card with animation
+    const card = createPortalCard(portal, 0);
+    card.classList.add('portal-card-new');
+
+    // Insert after loading/empty states
+    const firstPortalCard = portalsGrid.querySelector('.portal-card');
+    if (firstPortalCard) {
+        portalsGrid.insertBefore(card, firstPortalCard);
+    } else {
+        portalsGrid.appendChild(card);
+    }
+
+    // Update portal count if it's the current user's portal
+    if (portal.creator && portal.creator.id === currentUser.id) {
+        if (!currentUser.portals) {
+            currentUser.portals = [];
+        }
+        currentUser.portals.push(portal);
+        document.getElementById('totalPortals').textContent = currentUser.portals.length;
+    }
+
+    // Show toast notification for other users' portals
+    if (!portal.creator || portal.creator.id !== currentUser.id) {
+        const creatorName = portal.creator
+            ? `${portal.creator.firstName} ${portal.creator.lastName}`
+            : 'Someone';
+        showToast(`${creatorName} Created a New Portal`, 'success');
+    }
+}
+
+function handlePortalDeletedEvent(portal) {
+    // Remove from allPortals array
+    const index = allPortals.findIndex(p => p.id === portal.id);
+    if (index === -1) return;
+
+    allPortals.splice(index, 1);
+
+    // Remove card from DOM with animation
+    const card = document.querySelector(`.portal-card[data-portal-id="${portal.id}"]`);
+    if (card) {
+        card.classList.add('portal-card-removing');
+        setTimeout(() => {
+            card.remove();
+
+            // Show empty state if no portals left
+            if (allPortals.length === 0) {
+                document.getElementById('portalsEmpty').style.display = 'flex';
+            }
+        }, 300);
+    }
+
+    // Update portal count if it's the current user's portal
+    if (portal.creator && portal.creator.id === currentUser.id) {
+        currentUser.portals = currentUser.portals.filter(p => p.id !== portal.id);
+        document.getElementById('totalPortals').textContent = currentUser.portals.length;
+    }
+
+    // Show toast notification for other users' deletions
+    if (!portal.creator || portal.creator.id !== currentUser.id) {
+        showToast(`A Portal Was Removed`, 'info');
+    }
+}
+
+function disconnectWebSocket() {
+    if (stompClient !== null) {
+        stompClient.disconnect();
+        stompClient = null;
+        console.log('WebSocket Disconnected');
     }
 }
 
@@ -283,6 +416,9 @@ function createPortalCard(portal, index) {
    ============================================ */
 async function handleLogout() {
     try {
+        // Disconnect WebSocket before logout
+        disconnectWebSocket();
+
         const response = await fetch('/api/users/logout', {
             method: 'POST',
             credentials: 'include'

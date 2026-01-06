@@ -47,6 +47,8 @@ public class SecurityConfig {
                                 "/register",
                                 "/css/**",
                                 "/js/**",
+                                "/ws/**",
+                                "/ws",
                                 "/images/**",
                                 "/favicon.ico"
                         ).permitAll()
@@ -59,7 +61,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // adjust frontend url as needed
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:*", "https://localhost:*")); // use patterns for credentials support
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);

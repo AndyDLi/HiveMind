@@ -7,6 +7,7 @@ import com.andydli.hivemind.model.Portal;
 import com.andydli.hivemind.mapper.PortalMapper;
 import com.andydli.hivemind.dto.PortalDTO;
 import com.andydli.hivemind.dto.PortalCreationDTO;
+import com.andydli.hivemind.dto.PortalEventDTO;
 import com.andydli.hivemind.repository.PortalRepository;
 import com.andydli.hivemind.model.User;
 import com.andydli.hivemind.exceptions.ResourceNotFoundException;
@@ -20,11 +21,18 @@ public class PortalService {
     private final UserRepository userRepository;
     private final PortalMapper portalMapper;
     private final PortalRepository portalRepository;
+    private final WebSocketMessageService webSocketMessageService;
 
-    public PortalService(UserRepository userRepository, PortalMapper portalMapper, PortalRepository portalRepository) {
+    public PortalService(
+            UserRepository userRepository,
+            PortalMapper portalMapper,
+            PortalRepository portalRepository,
+            WebSocketMessageService webSocketMessageService
+    ) {
         this.userRepository = userRepository;
         this.portalMapper = portalMapper;
         this.portalRepository = portalRepository;
+        this.webSocketMessageService = webSocketMessageService;
     }
 
     @Transactional(readOnly = true)
@@ -44,7 +52,12 @@ public class PortalService {
         creator.addPortal(portal);
 
         Portal savedPortal = portalRepository.save(portal);
-        return portalMapper.toDTO(savedPortal);
+        PortalDTO portalDTO = portalMapper.toDTO(savedPortal);
+
+        PortalEventDTO portalEventDTO = new PortalEventDTO("CREATED", portalDTO);
+        webSocketMessageService.broadcastMessage(portalEventDTO);
+
+        return portalDTO;
     }
 
     @Transactional
@@ -57,8 +70,11 @@ public class PortalService {
             throw new ForbiddenOperationException("User Not Authorized to Delete this Portal");
         }
 
-        creator.removePortal(portal);
+        PortalDTO portalDTO = portalMapper.toDTO(portal);
+        PortalEventDTO portalEventDTO = new PortalEventDTO("DELETED", portalDTO);
+        webSocketMessageService.broadcastMessage(portalEventDTO);
 
+        creator.removePortal(portal);
         portalRepository.delete(portal); // redundant due to orphanRemoval setting, though no harm
     }
 }

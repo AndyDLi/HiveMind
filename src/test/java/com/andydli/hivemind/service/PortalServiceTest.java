@@ -15,6 +15,7 @@ import com.andydli.hivemind.dto.PortalCreationDTO;
 import com.andydli.hivemind.mapper.PortalMapper;
 import com.andydli.hivemind.model.User;
 import com.andydli.hivemind.dto.UserPublicDTO;
+import com.andydli.hivemind.dto.PortalEventDTO;
 import com.andydli.hivemind.exceptions.ResourceNotFoundException;
 import com.andydli.hivemind.exceptions.ForbiddenOperationException;
 
@@ -36,6 +37,9 @@ public class PortalServiceTest {
 
     @Mock
     private PortalRepository portalRepository;
+
+    @Mock
+    private WebSocketMessageService webSocketMessageService;
 
     @InjectMocks
     private PortalService portalService;
@@ -126,15 +130,22 @@ public class PortalServiceTest {
         assertNotNull(result, "Created Portal Should Not Be Null");
         assertEquals(expectedPortalDTO, result, "Created Portal Should Match Expected");
 
-        ArgumentCaptor<Portal> captor = ArgumentCaptor.forClass(Portal.class);
+        ArgumentCaptor<Portal> portalCaptor = ArgumentCaptor.forClass(Portal.class);
+        ArgumentCaptor<PortalEventDTO> eventCaptor = ArgumentCaptor.forClass(PortalEventDTO.class);
+
         verify(userRepository).findById(USER_ID);
         verify(portalMapper).toEntity(portalCreationDTO);
         verify(user).addPortal(newPortal);
-        verify(portalRepository).save(captor.capture());
+        verify(portalRepository).save(portalCaptor.capture());
         verify(portalMapper).toDTO(savedPortal);
+        verify(webSocketMessageService).broadcastMessage(eventCaptor.capture());
 
-        Portal capturedPortal = captor.getValue();
+        Portal capturedPortal = portalCaptor.getValue();
         assertEquals(newPortal, capturedPortal, "Persisted Portal Should Match Created Portal");
+
+        PortalEventDTO capturedEvent = eventCaptor.getValue();
+        assertEquals("CREATED", capturedEvent.eventType(), "Event Type Should Be CREATED");
+        assertEquals(expectedPortalDTO, capturedEvent.portalDTO(), "Event Portal Should Match Created Portal");
     }
 
     @Test
@@ -158,21 +169,33 @@ public class PortalServiceTest {
     @Test
     @DisplayName("Deleting Valid Portal Should Delete Portal and Remove Bidirectional Relationship")
     void deletePortal_whenValidPortal_shouldDeletePortalAndRemoveBidirectionalRelationship() {
+        UserPublicDTO userPublicDTO = new UserPublicDTO(USER_ID, USER_FIRST_NAME, USER_LAST_NAME, new ArrayList<>(), null, Instant.now(), Instant.now());
+        PortalDTO portalDTO = new PortalDTO(PORTAL_ID, PORTAL_TOPIC, PORTAL_DESCRIPTION, userPublicDTO, Instant.now(), Instant.now());
+
         when(portalRepository.findById(PORTAL_ID)).thenReturn(Optional.of(portal));
         when(portal.getCreator()).thenReturn(user);
         when(user.getId()).thenReturn(USER_ID);
+        when(portalMapper.toDTO(portal)).thenReturn(portalDTO);
 
         portalService.deletePortal(PORTAL_ID, USER_ID);
 
-        ArgumentCaptor<Portal> captor = ArgumentCaptor.forClass(Portal.class);
+        ArgumentCaptor<Portal> portalCaptor = ArgumentCaptor.forClass(Portal.class);
+        ArgumentCaptor<PortalEventDTO> eventCaptor = ArgumentCaptor.forClass(PortalEventDTO.class);
+
         verify(portalRepository).findById(PORTAL_ID);
-        verify(portal).getCreator();
+        verify(portal, atLeastOnce()).getCreator();
         verify(user).getId();
-        verify(user).removePortal(captor.capture());
+        verify(portalMapper).toDTO(portal);
+        verify(webSocketMessageService).broadcastMessage(eventCaptor.capture());
+        verify(user).removePortal(portalCaptor.capture());
         verify(portalRepository).delete(portal);
 
-        Portal removedPortal = captor.getValue();
+        Portal removedPortal = portalCaptor.getValue();
         assertEquals(portal, removedPortal, "Removed Portal Should Match Deleted Portal");
+
+        PortalEventDTO capturedEvent = eventCaptor.getValue();
+        assertEquals("DELETED", capturedEvent.eventType(), "Event Type Should Be DELETED");
+        assertEquals(portalDTO, capturedEvent.portalDTO(), "Event Portal Should Match Deleted Portal");
     }
 
     @Test
