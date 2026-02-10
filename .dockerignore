@@ -1,0 +1,32 @@
+# Build output directories
+build/
+target/
+out/
+bin/
+
+# Gradle
+.gradle/
+gradle-wrapper.jar
+
+# IDE files
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.classpath
+.project
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Git
+.git/
+.gitignore
+.env
